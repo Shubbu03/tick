@@ -70,6 +70,7 @@ const userSchema: Schema<User> = new Schema({
   monthlyExpense: {
     type: Number,
     required: true,
+    default: 0
   },
   subscription: [subscriptionSchema],
 });
