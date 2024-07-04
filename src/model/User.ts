@@ -1,8 +1,16 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+enum planType {
+  Monthly = "Monthly",
+  Quaterly = "Quaterly",
+  Half_Yearly = "Half_Yearly",
+  Yearly = "Yearly"
+}
+
 export interface Subscription extends Document {
   name: string;
   planSelected: string;
+  planDuration : planType
   price: number;
   dueDate: Date;
   isActive: Boolean;
@@ -26,6 +34,10 @@ const subscriptionSchema: Schema<Subscription> = new Schema({
   planSelected: {
     type: String,
     required: true,
+  },
+  planDuration: {
+    type: String,
+    enum: Object.values(planType),
   },
   price: {
     type: Number,
