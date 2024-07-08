@@ -37,10 +37,20 @@ export async function POST(request: Request) {
 
     user.subscription.push(newSubscription as unknown as Subscription);
 
+    if (newSubscription.planDuration === "Yearly") {
+      user.monthlyExpense += newSubscription.price / 12;
+    } else if (newSubscription.planDuration === "Half_Yearly") {
+      user.monthlyExpense += newSubscription.price / 6;
+    } else if (newSubscription.planDuration === "Quaterly") {
+      user.monthlyExpense += newSubscription.price / 3;
+    } else {
+      user.monthlyExpense += newSubscription.price;
+    }
+
     await user.save();
 
     return Response.json(
-      { success: true, message: "New subscription added!!" },
+      { data: user, success: true, message: "New subscription added!!" },
       { status: 200 }
     );
   } catch (err) {
