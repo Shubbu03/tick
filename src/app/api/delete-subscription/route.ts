@@ -18,12 +18,25 @@ export async function DELETE(request: Request) {
       throw new Error("User not found");
     }
 
+    const removeExpense = user.subscription.filter(
+      (sub) => sub.id === subscriptionId
+    );
+
+    if (removeExpense[0].planDuration === "Yearly") {
+      user.monthlyExpense -= removeExpense[0].price / 12;
+    } else if (removeExpense[0].planDuration === "Half_Yearly") {
+      user.monthlyExpense -= removeExpense[0].price / 6;
+    } else if (removeExpense[0].planDuration === "Quaterly") {
+      user.monthlyExpense -= removeExpense[0].price / 3;
+    } else {
+      user.monthlyExpense -= removeExpense[0].price;
+    }
+
     const data = user.subscription.filter((sub) => sub.id !== subscriptionId);
 
     user.subscription = data as [Subscription];
 
     await user.save();
-    console.log("Selected Subscription::", user.subscription);
 
     if (!user) {
       return Response.json(
@@ -32,11 +45,11 @@ export async function DELETE(request: Request) {
       );
     }
 
-    if(user.subscription.length <= 0){
-        return Response.json(
-            { success: false, message: "No subscription to delete!!" },
-            { status: 400 }
-          );
+    if (user.subscription.length <= 0) {
+      return Response.json(
+        { success: false, message: "No subscription to delete!!" },
+        { status: 400 }
+      );
     }
     return Response.json(
       {
