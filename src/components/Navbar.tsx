@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { User } from "next-auth";
 import { Button } from "./ui/button";
+import { Theme } from "./Theme";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -22,13 +23,16 @@ const Navbar = () => {
             <span className="mr-4">
               Welcome , {user?.username || user?.email}
             </span>
-            <Button
-              onClick={() => signOut()}
-              className="w-full md:w-auto bg-slate-100 text-black"
-              variant="outline"
-            >
-              Logout
-            </Button>
+            <div className="flex items-center space-x-4">
+              <Theme />
+              <Button
+                onClick={() => signOut()}
+                className="w-full md:w-auto bg-slate-100 text-black"
+                variant="outline"
+              >
+                Logout
+              </Button>
+            </div>
           </>
         ) : (
           <Link href="/login">
