@@ -18,8 +18,6 @@ export async function GET(request: Request) {
     );
   }
 
-  //   const userId = new mongoose.Types.ObjectId(currentUser._id);
-
   try {
     const expense = currentUser.monthlyExpense;
 
@@ -39,7 +37,7 @@ export async function GET(request: Request) {
         success: true,
         message: "User's monthly expense fetched successfully!!",
       },
-      { status: 400 }
+      { status: 201 }
     );
   } catch (err) {
     console.log("Error fetching user's monthly expense!!", err);
