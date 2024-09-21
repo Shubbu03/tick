@@ -11,57 +11,20 @@ export async function PUT(request: Request) {
       id: searchParams.get("id"),
     };
 
-    const { subscriptionId, planSelected, planDuration, price, dueDate } =
+    const { name, subscriptionId, planSelected, planDuration, price, dueDate } =
       await request.json();
 
-    // const user = await UserModel.findById(queryParam.id);
+    const userId = new mongoose.Types.ObjectId(queryParam.id);
 
-    // console.log("id::", user);
-    // const query = { id: queryParam.id, "subscription._id": subscriptionId };
-
-    // console.log("Query:", query);
-
-    // const user = await UserModel.findOne(query?.id).findOne(query["subscription._id"])
-
-    // console.log(user)
-
-    // const user = await UserModel.findById(queryParam.id);
-
-    // const data = user?.subscription.filter((sub) => sub.id === subscriptionId);
-
-    const userId = new mongoose.Types.ObjectId(queryParam.id as string);
-
-    // const user = await UserModel.updateOne(
-    //   // { id: queryParam.id, "subscription._id": subscriptionId },
-    //   { id: queryParam.id , "subscription[1]._id": subscriptionId},
-    //   {
-    //     $set: {
-    //       planSelected: planSelected,
-    //       planDuration: planDuration,
-    //       price: price,
-    //       dueDate: dueDate,
-    //     },
-    //   }
-    // );
-
-    const user = await UserModel.findById({
-      // id: queryParam.id,
-      id: userId,
-      "subscription[1]._id": subscriptionId,
+    const user = await UserModel.findOne({
+      _id: userId,
     });
-    console.log("id::", user);
-
-    // const editField = user?.subscription.filter(
-    //   (sub) => sub.id === subscriptionId
-    // );
-
-    // console.log("user:", editField);
 
     if (!user) {
       console.log("Unable to edit user subscription!!");
       return Response.json(
         {
-          data: user,
+          data: null,
           success: false,
           message: "Unable to edit user subscription!!",
         },
@@ -69,8 +32,54 @@ export async function PUT(request: Request) {
       );
     }
 
+    const subscriptionIndex = user.subscription.findIndex(
+      (sub) => sub._id.toString() === subscriptionId
+    );
+
+    if (subscriptionIndex === -1) {
+      return Response.json(
+        {
+          data: null,
+          success: false,
+          message: "Subscription not found!!",
+        },
+        { status: 404 }
+      );
+    }
+
+    let monthlyExpense = parseFloat(user.monthlyExpense || "0");
+    const oldSubscription = user.subscription[subscriptionIndex];
+    const oldMonthlyPrice = calculateMonthlyPrice(
+      oldSubscription.price,
+      oldSubscription.planDuration
+    );
+    const newMonthlyPrice = calculateMonthlyPrice(price, planDuration);
+
+    // Update monthly expense
+    monthlyExpense = monthlyExpense - oldMonthlyPrice + newMonthlyPrice;
+
+    // Update the subscription
+    user.subscription[subscriptionIndex] = {
+      name,
+      planSelected,
+      planDuration,
+      price,
+      dueDate,
+      isActive: true,
+    };
+
+    // Update the user's monthly expense
+    user.monthlyExpense = monthlyExpense.toFixed(2);
+
+    await user.save();
+
     return Response.json(
-      { data: user, success: true, message: "User subscription edited!!" },
+      {
+        data: user,
+        success: true,
+        message: "User subscription edited!!",
+        updatedMonthlyExpense: user.monthlyExpense,
+      },
       { status: 200 }
     );
   } catch (err) {
@@ -79,5 +88,19 @@ export async function PUT(request: Request) {
       { success: false, message: "Error editing subscription details!!" },
       { status: 400 }
     );
+  }
+}
+
+function calculateMonthlyPrice(price: string, planDuration: string): number {
+  const numericPrice = parseFloat(price);
+  switch (planDuration) {
+    case "Yearly":
+      return numericPrice / 12;
+    case "Half_Yearly":
+      return numericPrice / 6;
+    case "Quaterly":
+      return numericPrice / 3;
+    default: // Monthly
+      return numericPrice;
   }
 }
