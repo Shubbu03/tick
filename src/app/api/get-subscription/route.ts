@@ -2,7 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
 import { getServerSession, User } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 export async function GET(request: Request) {
   await dbConnect();
@@ -10,8 +10,6 @@ export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
 
   const currentUser: User = session?.user as User;
-
-  console.log("Session and user!!!",session,currentUser)
 
   if (!session || !session.user) {
     return Response.json(
@@ -37,15 +35,17 @@ export async function GET(request: Request) {
       );
     }
 
-    console.log("user subscription are::", user[0].subscription);
     return Response.json(
       { success: true, subscription: user[0].subscription },
       { status: 200 }
     );
   } catch (err) {
-    console.log("Error fetching user subscription!!", err);
     return Response.json(
-      { success: false, message: "Error fetching user subscription!!" },
+      {
+        success: false,
+        message: "Error fetching user subscription!!",
+        err: err,
+      },
       { status: 400 }
     );
   }
