@@ -19,8 +19,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const expense = currentUser.monthlyExpense;
-
+    const user = await UserModel.findById(currentUser._id);
+    const expense = user?.monthlyExpense;
     if (!expense) {
       return Response.json(
         {
