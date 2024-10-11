@@ -50,9 +50,8 @@ export async function POST(request: Request) {
       subscription: [],
     });
 
-    console.log("User::",user)
+    console.log("User::", user);
     await user.save();
-
     return Response.json(
       { success: true, message: "User registered successfully" },
       { status: 200 }
