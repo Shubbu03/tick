@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import axios, { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import { useDebounceCallback } from "usehooks-ts";
 import { signupSchema } from "@/schemas/signupSchema";
 
@@ -44,7 +44,7 @@ export default function Signup() {
     const checkUsernameUnique = async () => {
       if (username) {
         setIsCheckingUsername(true);
-        setUsernameMessage(""); // Reset message
+        setUsernameMessage("");
         try {
           const response = await axios.get(
             `/api/check-username?username=${username}`
@@ -52,7 +52,7 @@ export default function Signup() {
           setUsernameMessage(response.data.message);
         } catch (error) {
           const axiosError = error as AxiosError;
-          setUsernameMessage("Error checking username");
+          setUsernameMessage("Username already exists,try another");
         } finally {
           setIsCheckingUsername(false);
         }
@@ -71,12 +71,11 @@ export default function Signup() {
         title: "Success",
         description: response.data.message,
       });
-
       setIsSubmitting(false);
+      router.replace("/dashboard");
     } catch (err) {
       const axiosError = err as AxiosError;
 
-      // Default error message
       let errorMessage =
         "There was a problem with your sign-up. Please try again.";
 
