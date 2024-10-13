@@ -45,7 +45,6 @@ const subscriptionSchema: Schema<Subscription> = new Schema({
   },
   dueDate: {
     type: Date,
-    required: true,
   },
   isActive: {
     type: Boolean,
