@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       { $group: { _id: "$_id", subscription: { $push: "$subscription" } } },
     ]);
 
-    if (!user || user.length === 0) {
+    if (!user) {
       return Response.json(
         { success: false, message: "User not found!!" },
         { status: 404 }
