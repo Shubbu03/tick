@@ -31,6 +31,17 @@ export async function GET(request: Request) {
       );
     }
 
+    if (expense == 0) {
+      return Response.json(
+        {
+          success: true,
+          message: "Add subscription to view monthly expense",
+        },
+        { status: 201 }
+      );
+    }
+
+
     return Response.json(
       {
         data: expense,
@@ -40,7 +51,6 @@ export async function GET(request: Request) {
       { status: 201 }
     );
   } catch (err) {
-    console.log("Error fetching user's monthly expense!!", err);
     return Response.json(
       { success: false, message: "Error fetching user's monthly expense!!" },
       { status: 400 }
