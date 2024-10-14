@@ -114,16 +114,7 @@ export default function Dashboard() {
     },
   });
 
-  const resetForm = () => {
-    form.reset({
-      name: "",
-      planSelected: "",
-      planDuration: PlanDuration.Monthly,
-      price: 0,
-      dueDate: undefined,
-    });
-    setEditingSubscriptionId(null);
-  };
+  const toggleDarkMode = () => setDarkMode(!darkMode);
 
   const onSubmit = async (data: z.infer<typeof subscriptionSchema>) => {
     if (editingSubscriptionId) {
@@ -214,7 +205,7 @@ export default function Dashboard() {
       planSelected: subscriptionToEdit.planSelected,
       planDuration: subscriptionToEdit.planDuration,
       price: subscriptionToEdit.price,
-      dueDate: new Date(subscriptionToEdit.dueDate),
+      // dueDate: new Date(subscriptionToEdit.dueDate),
     });
     setIsDialogOpen(true);
   };
@@ -229,7 +220,7 @@ export default function Dashboard() {
           {
             subscriptionId: editingSubscriptionId,
             ...data,
-            dueDate: data.dueDate?.toISOString(),
+            // dueDate: data.dueDate?.toISOString(),
           },
           {
             headers: {
@@ -455,15 +446,7 @@ export default function Dashboard() {
           </Card>
         </main>
 
-        <Dialog
-          open={isDialogOpen}
-          onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) {
-              resetForm();
-            }
-          }}
-        >
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="fixed bottom-8 right-8 rounded-full" size="icon">
               <Plus className="h-6 w-6" />
