@@ -1,11 +1,21 @@
 "use client";
 
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Mail, ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
 
 export default function Home() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null; 
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600 dark:from-gray-900 dark:to-gray-700">
       <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-24 py-12 text-white">
@@ -46,7 +56,7 @@ export default function Home() {
       </main>
 
       <footer className="text-center p-4 md:p-6 bg-white/10 backdrop-blur-md text-white">
-        <p>© 2024 Tick. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Tick. All rights reserved.</p>
         <div className="mt-2">
           <Button
             variant="ghost"
