@@ -24,7 +24,6 @@ export async function PUT(request: Request) {
       console.log("Unable to edit user subscription!!");
       return Response.json(
         {
-          data: null,
           success: false,
           message: "Unable to edit user subscription!!",
         },
@@ -39,7 +38,6 @@ export async function PUT(request: Request) {
     if (subscriptionIndex === -1) {
       return Response.json(
         {
-          data: null,
           success: false,
           message: "Subscription not found!!",
         },
