@@ -15,55 +15,59 @@ export async function DELETE(request: Request) {
     const user = await UserModel.findById(queryParam.id);
 
     if (!user) {
-      throw new Error("User not found");
+      return Response.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
     }
 
-    const removeExpense = user.subscription.filter(
+    if (!user.subscription || user.subscription.length <= 0) {
+      return Response.json(
+        { success: false, message: "No subscription to delete!" },
+        { status: 400 }
+      );
+    }
+
+    const subscriptionToRemove = user.subscription.find(
       (sub) => sub.id === subscriptionId
     );
 
-    if (removeExpense[0].planDuration === "Yearly") {
-      user.monthlyExpense -= removeExpense[0].price / 12;
-    } else if (removeExpense[0].planDuration === "Half_Yearly") {
-      user.monthlyExpense -= removeExpense[0].price / 6;
-    } else if (removeExpense[0].planDuration === "Quarterly") {
-      user.monthlyExpense -= removeExpense[0].price / 3;
-    } else {
-      user.monthlyExpense -= removeExpense[0].price;
+    if (!subscriptionToRemove) {
+      return Response.json(
+        { success: false, message: "Subscription not found" },
+        { status: 404 }
+      );
     }
 
-    const data = user.subscription.filter((sub) => sub.id !== subscriptionId);
+    const monthlyDivisors = {
+      Yearly: 12,
+      Half_Yearly: 6,
+      Quarterly: 3,
+      Monthly: 1,
+    };
 
-    user.subscription = data as [Subscription];
+    const divisor = monthlyDivisors[subscriptionToRemove.planDuration] || 1;
+    user.monthlyExpense -= subscriptionToRemove.price / divisor;
+
+    user.subscription = user.subscription.filter(
+      (sub) => sub.id !== subscriptionId
+    ) as [Subscription];
 
     await user.save();
 
-    if (!user) {
-      return Response.json(
-        { success: false, message: "Cannot delete user subscription" },
-        { status: 400 }
-      );
-    }
-
-    if (user.subscription.length <= 0) {
-      return Response.json(
-        { success: false, message: "No subscription to delete!!" },
-        { status: 400 }
-      );
-    }
     return Response.json(
       {
         data: user.subscription,
         success: true,
-        message: "User subscription deleted!!",
+        message: "User subscription deleted successfully",
       },
       { status: 200 }
     );
   } catch (err) {
-    console.log("Error deleting user subscription!!", err);
+    console.error("Error deleting user subscription:", err);
     return Response.json(
-      { success: false, message: "Error deleting user subscription!!" },
-      { status: 401 }
+      { success: false, message: "Error deleting user subscription" },
+      { status: 500 }
     );
   }
 }
