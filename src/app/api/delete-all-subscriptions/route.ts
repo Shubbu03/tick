@@ -10,45 +10,39 @@ export async function DELETE(request: Request) {
       id: searchParams.get("id"),
     };
 
+    if (!queryParam.id) {
+      return Response.json(
+        { success: false, message: "User ID is required" },
+        { status: 400 }
+      );
+    }
+
     const user = await UserModel.findById(queryParam.id);
 
     if (!user) {
-      throw new Error("User not found");
-    }
-
-    const emptySubs = user.subscription.splice(0, user.subscription.length);
-
-    if (!emptySubs) {
       return Response.json(
-        { success: false, message: "Error deleting subscriptions!!" },
-        { status: 400 }
+        { success: false, message: "User not found" },
+        { status: 404 }
       );
     }
 
+    user.subscription.splice(0, user.subscription.length);
     user.monthlyExpense = 0;
-
     await user.save();
-
-    if (!user) {
-      return Response.json(
-        { success: false, message: "Cannot delete user subscription" },
-        { status: 400 }
-      );
-    }
 
     return Response.json(
       {
         data: user.subscription,
         success: true,
-        message: "All User subscriptions deleted!!",
+        message: "All user subscriptions deleted successfully",
       },
       { status: 200 }
     );
   } catch (err) {
-    console.log("Error deleting user subscription!!", err);
+    console.error("Error deleting user subscriptions:", err);
     return Response.json(
-      { success: false, message: "Error deleting user subscription!!" },
-      { status: 401 }
+      { success: false, message: "Error deleting user subscriptions" },
+      { status: 500 }
     );
   }
 }

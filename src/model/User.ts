@@ -1,19 +1,28 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-enum planType {
+export enum PlanType {
   Monthly = "Monthly",
-  Quaterly = "Quaterly",
+  Quarterly = "Quarterly",
   Half_Yearly = "Half_Yearly",
-  Yearly = "Yearly"
+  Yearly = "Yearly",
 }
 
 export interface Subscription extends Document {
   name: string;
   planSelected: string;
-  planDuration : planType
+  planDuration: PlanType;
   price: number;
+  startDate: Date;
   dueDate: Date;
-  isActive: Boolean;
+  isActive: boolean;
+  autoRenew: boolean;
+  paymentHistory: [
+    {
+      amount: number;
+      date: Date;
+      status: string;
+    }
+  ];
 }
 
 export interface User extends Document {
@@ -26,32 +35,60 @@ export interface User extends Document {
   subscription: [Subscription];
 }
 
-const subscriptionSchema: Schema<Subscription> = new Schema({
-  name: {
-    type: String,
-    required: true,
+const subscriptionSchema: Schema<Subscription> = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    planSelected: {
+      type: String,
+      required: true,
+    },
+    planDuration: {
+      type: String,
+      enum: Object.values(PlanType),
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
+    dueDate: {
+      type: Date,
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    autoRenew: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    paymentHistory: [
+      {
+        amount: Number,
+        date: Date,
+        status: {
+          type: String,
+          enum: ["success", "failed", "pending"],
+          default: "pending",
+        },
+      },
+    ],
   },
-  planSelected: {
-    type: String,
-    required: true,
-  },
-  planDuration: {
-    type: String,
-    enum: Object.values(planType),
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  dueDate: {
-    type: Date,
-  },
-  isActive: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 const userSchema: Schema<User> = new Schema({
   username: {
@@ -81,7 +118,7 @@ const userSchema: Schema<User> = new Schema({
   monthlyExpense: {
     type: Number,
     required: true,
-    default: 0
+    default: 0,
   },
   subscription: [subscriptionSchema],
 });

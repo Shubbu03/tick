@@ -18,6 +18,13 @@ export async function GET(request: Request) {
     );
   }
 
+  if (!currentUser._id) {
+    return Response.json(
+      { success: false, message: "Invalid user ID" },
+      { status: 400 }
+    );
+  }
+
   const userId = new mongoose.Types.ObjectId(currentUser._id);
 
   try {
@@ -28,7 +35,7 @@ export async function GET(request: Request) {
       { $group: { _id: "$_id", subscription: { $push: "$subscription" } } },
     ]);
 
-    if (!user) {
+    if (!user || user.length === 0) {
       return Response.json(
         { success: false, message: "User not found!!" },
         { status: 404 }
@@ -40,13 +47,14 @@ export async function GET(request: Request) {
       { status: 200 }
     );
   } catch (err) {
+    console.error("Subscription fetch error:", err);
     return Response.json(
       {
         success: false,
         message: "Error fetching user subscription!!",
-        err: err,
+        error: err instanceof Error ? err.message : "Unknown error",
       },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }

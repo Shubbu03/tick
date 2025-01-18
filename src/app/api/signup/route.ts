@@ -49,8 +49,7 @@ export async function POST(request: Request) {
       monthlyExpense: 0,
       subscription: [],
     });
-
-    console.log("User::", user);
+    
     await user.save();
     return Response.json(
       { success: true, message: "User registered successfully" },

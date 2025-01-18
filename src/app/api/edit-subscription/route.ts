@@ -7,45 +7,52 @@ export async function PUT(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const queryParam = {
-      id: searchParams.get("id"),
-    };
+    const userId = searchParams.get("id");
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return Response.json(
+        { success: false, message: "Invalid user ID provided" },
+        { status: 400 }
+      );
+    }
 
     const { name, subscriptionId, planSelected, planDuration, price, dueDate } =
       await request.json();
 
-    const userId = new mongoose.Types.ObjectId(queryParam.id);
-
-    const user = await UserModel.findOne({
-      _id: userId,
-    });
-
-    if (!user) {
-      console.log("Unable to edit user subscription!!");
+    if (
+      !name ||
+      !subscriptionId ||
+      !planSelected ||
+      !planDuration ||
+      !price ||
+      !dueDate
+    ) {
       return Response.json(
-        {
-          success: false,
-          message: "Unable to edit user subscription!!",
-        },
-        { status: 401 }
+        { success: false, message: "Missing required fields" },
+        { status: 400 }
       );
     }
 
-    const subscriptionIndex = user.subscription.findIndex(
-      (sub) => sub._id.toString() === subscriptionId
-    );
+    const user = await UserModel.findById(userId);
 
-    if (subscriptionIndex === -1) {
+    if (!user) {
       return Response.json(
-        {
-          success: false,
-          message: "Subscription not found!!",
-        },
+        { success: false, message: "User not found" },
         { status: 404 }
       );
     }
 
-    let monthlyExpense = parseFloat(user.monthlyExpense || "0");
+    const subscriptionIndex = user.subscription.findIndex(
+      (sub) => sub._id?.toString() === subscriptionId
+    );
+
+    if (subscriptionIndex === -1) {
+      return Response.json(
+        { success: false, message: "Subscription not found" },
+        { status: 404 }
+      );
+    }
+
     const oldSubscription = user.subscription[subscriptionIndex];
     const oldMonthlyPrice = calculateMonthlyPrice(
       oldSubscription.price,
@@ -53,52 +60,55 @@ export async function PUT(request: Request) {
     );
     const newMonthlyPrice = calculateMonthlyPrice(price, planDuration);
 
-    // Update monthly expense
-    monthlyExpense = monthlyExpense - oldMonthlyPrice + newMonthlyPrice;
+    const currentMonthlyExpense = Number(user.monthlyExpense || 0);
+    const updatedMonthlyExpense = Number(
+      (currentMonthlyExpense - oldMonthlyPrice + newMonthlyPrice).toFixed(2)
+    );
 
-    // Update the subscription
     user.subscription[subscriptionIndex] = {
+      _id: oldSubscription._id,
       name,
       planSelected,
       planDuration,
       price,
       dueDate,
       isActive: true,
-    };
+      autoRenew: oldSubscription.autoRenew,
+      paymentHistory: oldSubscription.paymentHistory,
+      startDate: oldSubscription.startDate,
+    } as any;
 
-    // Update the user's monthly expense
-    user.monthlyExpense = monthlyExpense.toFixed(2);
+    user.monthlyExpense = updatedMonthlyExpense;
 
     await user.save();
 
     return Response.json(
       {
-        data: user,
         success: true,
-        message: "User subscription edited!!",
-        updatedMonthlyExpense: user.monthlyExpense,
+        message: "Subscription updated successfully",
+        data: user,
+        updatedMonthlyExpense,
       },
       { status: 200 }
     );
-  } catch (err) {
-    console.log("Error editing subscription details!!", err);
+  } catch (error) {
+    console.error("Error updating subscription:", error);
     return Response.json(
-      { success: false, message: "Error editing subscription details!!" },
-      { status: 400 }
+      { success: false, message: "Failed to update subscription" },
+      { status: 500 }
     );
   }
 }
 
-function calculateMonthlyPrice(price: string, planDuration: string): number {
-  const numericPrice = parseFloat(price);
+function calculateMonthlyPrice(price: number, planDuration: string): number {
   switch (planDuration) {
     case "Yearly":
-      return numericPrice / 12;
+      return price / 12;
     case "Half_Yearly":
-      return numericPrice / 6;
-    case "Quaterly":
-      return numericPrice / 3;
+      return price / 6;
+    case "Quarterly":
+      return price / 3;
     default: // Monthly
-      return numericPrice;
+      return price;
   }
 }

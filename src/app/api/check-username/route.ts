@@ -35,23 +35,27 @@ export async function GET(request: Request) {
     const { username } = result.data;
 
     const existingVerifiedUsername = await UserModel.findOne({
-      username,
+      username: username.toLowerCase(),
     });
 
     if (existingVerifiedUsername) {
       return Response.json(
-        { success: false, message: "Username is already taken!!" },
+        { success: false, message: "This username is already taken" },
         { status: 400 }
       );
     }
 
     return Response.json(
-      { success: true, message: "Username is available!!" },
+      { success: true, message: "Username is available" },
       { status: 200 }
     );
   } catch (err) {
+    console.error("Username check error:", err);
     return Response.json(
-      { success: false, message: "Error verifying unique username!!" },
+      {
+        success: false,
+        message: "An error occurred while checking username availability",
+      },
       { status: 500 }
     );
   }

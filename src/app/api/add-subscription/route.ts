@@ -1,66 +1,115 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel, { Subscription } from "@/model/User";
+import UserModel, { Subscription, PlanType } from "@/model/User";
+import { z } from "zod";
+
+
+const subscriptionSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  name: z.string().min(1, "Subscription name is required"),
+  planSelected: z.string().min(1, "Plan selection is required"),
+  planDuration: z.enum([
+    "Monthly",
+    "Quarterly",
+    "Half_Yearly",
+    "Yearly",
+  ] as const),
+  price: z.number().positive("Price must be positive"),
+  dueDate: z.string().datetime("Invalid date format"),
+  autoRenew: z.boolean().default(false),
+});
 
 export async function POST(request: Request) {
   await dbConnect();
 
   try {
-    const { username, name, planSelected, planDuration, price, dueDate } =
-      await request.json();
+    const body = await request.json();
 
-    const user = await UserModel.findOne({ username });
+    const validatedData = subscriptionSchema.parse(body);
+
+    const user = await UserModel.findOne({ username: validatedData.username });
 
     if (!user) {
       return Response.json(
-        { success: false, message: "User not found!!" },
+        { success: false, message: "User not found" },
         { status: 404 }
       );
     }
-    if (price <= 0) {
-      return Response.json(
+
+    const getMonthlyExpense = (price: number, duration: PlanType): number => {
+      const durationMap = {
+        [PlanType.Yearly]: 12,
+        [PlanType.Half_Yearly]: 6,
+        [PlanType.Quarterly]: 3,
+        [PlanType.Monthly]: 1,
+      };
+      return price / durationMap[duration];
+    };
+
+    const newSubscription = {
+      name: validatedData.name,
+      planSelected: validatedData.planSelected,
+      planDuration: validatedData.planDuration,
+      price: validatedData.price,
+      startDate: new Date(),
+      dueDate: new Date(validatedData.dueDate),
+      isActive: true,
+      autoRenew: validatedData.autoRenew,
+      paymentHistory: [
         {
-          success: false,
-          message: "Subscription Price can't be zero!!",
+          amount: validatedData.price,
+          date: new Date(),
+          status: "success" as const,
         },
-        { status: 403 }
+      ],
+    };
+
+    if (newSubscription.dueDate <= newSubscription.startDate) {
+      return Response.json(
+        { success: false, message: "Due date must be in the future" },
+        { status: 400 }
       );
     }
 
-    const newSubscription = {
-      name,
-      planSelected,
-      planDuration,
-      price,
-      dueDate,
-      isActive: true,
-    };
-
     user.subscription.push(newSubscription as unknown as Subscription);
-
-    if (newSubscription.planDuration === "Yearly") {
-      user.monthlyExpense += newSubscription.price / 12;
-    } else if (newSubscription.planDuration === "Half_Yearly") {
-      user.monthlyExpense += newSubscription.price / 6;
-    } else if (newSubscription.planDuration === "Quaterly") {
-      user.monthlyExpense += newSubscription.price / 3;
-    } else {
-      user.monthlyExpense += newSubscription.price;
-    }
+    user.monthlyExpense += getMonthlyExpense(
+      newSubscription.price,
+      newSubscription.planDuration as PlanType
+    );
 
     await user.save();
 
     return Response.json(
-      { data: user, success: true, message: "New subscription added!!" },
-      { status: 200 }
+      {
+        data: {
+          subscription: newSubscription,
+          monthlyExpense: user.monthlyExpense,
+        },
+        success: true,
+        message: "Subscription added successfully",
+      },
+      { status: 201 }
     );
   } catch (err) {
-    console.log("Error occured while adding new subscription!!", err);
+    console.error("Subscription creation error:", err);
+
+    if (err instanceof z.ZodError) {
+      return Response.json(
+        {
+          success: false,
+          message: "Invalid input data",
+          errors: err.errors,
+        },
+        { status: 400 }
+      );
+    }
+
     return Response.json(
       {
         success: false,
-        message: "Error occured while adding new subscription!!",
+        message: "Failed to add subscription",
+        error: err instanceof Error ? err.message : "Unknown error",
       },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }

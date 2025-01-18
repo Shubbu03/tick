@@ -26,7 +26,7 @@ export async function DELETE(request: Request) {
       user.monthlyExpense -= removeExpense[0].price / 12;
     } else if (removeExpense[0].planDuration === "Half_Yearly") {
       user.monthlyExpense -= removeExpense[0].price / 6;
-    } else if (removeExpense[0].planDuration === "Quaterly") {
+    } else if (removeExpense[0].planDuration === "Quarterly") {
       user.monthlyExpense -= removeExpense[0].price / 3;
     } else {
       user.monthlyExpense -= removeExpense[0].price;
