@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { signinSchema } from "@/schemas/signinSchema";
+import { motion } from "framer-motion";
 
 export default function Login() {
   const router = useRouter();
@@ -59,13 +60,27 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-800">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden">
+      <div className="absolute top-4 right-4">
+      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl"
+      >
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-blue-600 dark:from-teal-200 dark:to-blue-300"
+          >
             Welcome Back to Tick
-          </h1>
-          <p className="mb-4">Login to view your subscription</p>
+          </motion.h1>
+          <p className="mb-4 text-gray-600 dark:text-gray-300">
+            Login to view your subscriptions
+          </p>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -74,8 +89,13 @@ export default function Login() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email/Username</FormLabel>
-                  <Input {...field} />
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Email/Username
+                  </FormLabel>
+                  <Input
+                    {...field}
+                    className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+                  />
                   <FormMessage />
                 </FormItem>
               )}
@@ -85,26 +105,38 @@ export default function Login() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <Input type="password" {...field} />
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Password
+                  </FormLabel>
+                  <Input
+                    type="password"
+                    {...field}
+                    className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+                  />
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button className="w-full" type="submit">
+            <Button
+              className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600"
+              type="submit"
+            >
               Login
             </Button>
           </form>
         </Form>
         <div className="text-center mt-4">
-          <p>
+          <p className="text-gray-600 dark:text-gray-300">
             Not a member yet?{" "}
-            <Link href="/signup" className="text-blue-600 hover:text-blue-800">
+            <Link
+              href="/signup"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
               Sign up
             </Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

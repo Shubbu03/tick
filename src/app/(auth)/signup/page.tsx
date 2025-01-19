@@ -17,9 +17,10 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import axios, { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
-import { useRouter, redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useDebounceCallback } from "usehooks-ts";
 import { signupSchema } from "@/schemas/signupSchema";
+import { motion } from "framer-motion";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -52,7 +53,7 @@ export default function Signup() {
           setUsernameMessage(response.data.message);
         } catch (error) {
           const axiosError = error as AxiosError;
-          setUsernameMessage("Username already exists,try another");
+          setUsernameMessage("Username already exists, try another");
         } finally {
           setIsCheckingUsername(false);
         }
@@ -90,13 +91,27 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-800">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden">
+      <div className="absolute top-4 right-4">
+      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl"
+      >
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-blue-600 dark:from-teal-200 dark:to-blue-300"
+          >
             Join Tick
-          </h1>
-          <p className="mb-4">Sign up to track your subscriptions</p>
+          </motion.h1>
+          <p className="mb-4 text-gray-600 dark:text-gray-300">
+            Sign up to track your subscriptions
+          </p>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -105,15 +120,20 @@ export default function Signup() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Username
+                  </FormLabel>
                   <Input
                     {...field}
                     onChange={(e) => {
                       field.onChange(e);
                       debounced(e.target.value);
                     }}
+                    className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
                   />
-                  {isCheckingUsername && <Loader2 className="animate-spin" />}
+                  {isCheckingUsername && (
+                    <Loader2 className="animate-spin text-teal-500" />
+                  )}
                   {!isCheckingUsername && usernameMessage && (
                     <p
                       className={`text-sm ${
@@ -134,8 +154,14 @@ export default function Signup() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <Input {...field} name="email" />
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Email
+                  </FormLabel>
+                  <Input
+                    {...field}
+                    name="email"
+                    className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+                  />
                   <FormMessage />
                 </FormItem>
               )}
@@ -146,13 +172,24 @@ export default function Signup() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <Input type="password" {...field} name="password" />
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Password
+                  </FormLabel>
+                  <Input
+                    type="password"
+                    {...field}
+                    name="password"
+                    className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+                  />
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -165,14 +202,17 @@ export default function Signup() {
           </form>
         </Form>
         <div className="text-center mt-4">
-          <p>
+          <p className="text-gray-600 dark:text-gray-300">
             Already a member?{" "}
-            <Link href="/login" className="text-blue-600 hover:text-blue-800">
+            <Link
+              href="/login"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
               Login
             </Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
