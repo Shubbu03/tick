@@ -1,79 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ThemeProvider } from "next-themes";
+import AnimatedBackground from "./components/AnimatedBackground";
+import Hero from "./components/Hero";
+import Features from "./components/Features";
+import Footer from "./components/Footer";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
-  const [isMounted, setIsMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    setMounted(true);
   }, []);
 
-  if (!isMounted) {
-    return null; 
+  if (!mounted) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 relative overflow-hidden">
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600 dark:from-gray-900 dark:to-gray-700">
-      <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-24 py-12 text-white">
-        <section className="text-center mb-12 max-w-3xl">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            All your subscriptions managed. Hassle Free.
-          </h1>
-          <p className="text-xl md:text-2xl mb-8">
-            Tick - A streamlined subscription manager to effortlessly track and
-            manage all your subscriptions.
-          </p>
-          <Button
-            asChild
-            size="lg"
-            className="bg-white text-indigo-600 hover:bg-white/90"
-          >
-            <Link href="/signup">
-              Get Started <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </section>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden">
+        <AnimatedBackground />
 
-        <section className="grid md:grid-cols-3 gap-8 mt-12">
-          {[
-            "Track all subscriptions in one place",
-            "Get reminders before renewals",
-            "Analyze your spending habits",
-          ].map((feature, index) => (
-            <div
-              key={index}
-              className="flex items-center bg-white/10 backdrop-blur-md rounded-lg p-4"
-            >
-              <CheckCircle className="h-6 w-6 mr-3 text-green-400" />
-              <p className="text-lg">{feature}</p>
-            </div>
-          ))}
-        </section>
-      </main>
+        <header className="absolute top-4 right-4 z-20"></header>
 
-      <footer className="text-center p-4 md:p-6 bg-white/10 backdrop-blur-md text-white">
-        <p>© {new Date().getFullYear()} Tick. All rights reserved.</p>
-        <div className="mt-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:text-white hover:bg-white/20"
-          >
-            Privacy Policy
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:text-white hover:bg-white/20"
-          >
-            Terms of Service
-          </Button>
-        </div>
-      </footer>
-    </div>
+        <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-24 py-12 text-white relative z-10">
+          <Hero />
+          <Features />
+        </main>
+
+        <Footer />
+      </div>
+    </ThemeProvider>
   );
 }
