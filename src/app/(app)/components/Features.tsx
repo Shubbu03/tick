@@ -21,7 +21,7 @@ export default function Features() {
         <motion.div
           key={index}
           whileHover={{ scale: 1.05 }}
-          className="flex items-center bg-gradient-to-r from-white/10 to-white/20 dark:from-white/5 dark:to-white/10 backdrop-blur-lg rounded-lg p-6 border border-white/10 shadow-lg"
+          className="flex items-center bg-gradient-to-r from-white/10 to-white/20 dark:from-white/5 dark:to-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/10 shadow-lg"
         >
           <motion.div
             animate={{ rotate: [0, 10, 0] }}

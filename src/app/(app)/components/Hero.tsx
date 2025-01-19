@@ -30,7 +30,7 @@ export default function Hero() {
         <Button
           asChild
           size="lg"
-          className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-[8px]"
         >
           <Link href="/signup" className="flex items-center">
             Start Saving Today
