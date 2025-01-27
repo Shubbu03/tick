@@ -8,9 +8,9 @@ import { useState } from "react";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Subscriptions", href: "/dashboard/subscriptions", icon: CreditCard },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart2 },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Subscriptions", href: "/subscriptions", icon: CreditCard },
+  { name: "Analytics", href: "/analytics", icon: BarChart2 },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
