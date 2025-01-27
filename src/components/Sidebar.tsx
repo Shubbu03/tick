@@ -8,7 +8,6 @@ import {
   CreditCard,
   BarChart2,
   Settings,
-  ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
@@ -28,11 +27,11 @@ export default function Sidebar() {
     <div
       className={`${
         isCollapsed ? "w-16" : "w-64"
-      } h-screen bg-white dark:bg-teal-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out fixed`}
+      } h-screen bg-gradient-to-b from-teal-500 to-cyan-600 dark:from-teal-950 dark:to-cyan-900 border-r border-white/10 transition-all duration-300 ease-in-out fixed`}
     >
       <motion.button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-6 bg-white dark:bg-teal-900 border border-gray-200 dark:border-gray-800 rounded-full p-1.5 text-gray-600 dark:text-gray-400 transition-transform duration-300 ease-in-out hover:bg-gray-50 dark:hover:bg-teal-800"
+        className="absolute -right-3 top-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-1.5 text-white transition-transform duration-300 ease-in-out hover:bg-white/20"
         animate={{ rotate: isCollapsed ? 0 : 180 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
@@ -42,7 +41,7 @@ export default function Sidebar() {
       <div className="p-6">
         <Link href="/dashboard" className="flex items-center space-x-2">
           <motion.span
-            className={`text-2xl font-bold text-teal-600 dark:text-teal-400 origin-left`}
+            className={`text-2xl font-bold text-white origin-left`}
             animate={{
               opacity: isCollapsed ? 0 : 1,
               scale: isCollapsed ? 0 : 1,
@@ -70,14 +69,14 @@ export default function Sidebar() {
                 isCollapsed ? "justify-center" : "px-2"
               } py-3 text-sm ${
                 isActive
-                  ? "text-teal-600 dark:text-teal-400"
-                  : "text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400"
-              } transition-all duration-300 ease-in-out group`}
+                  ? "text-white bg-white/10"
+                  : "text-white/80 hover:text-white hover:bg-white/10"
+              } rounded-lg transition-all duration-300 ease-in-out group`}
             >
               {isActive && (
                 <motion.div
                   layoutId="activeNav"
-                  className="absolute left-0 w-1 h-full bg-teal-600 dark:bg-teal-400"
+                  className="absolute left-0 w-1 h-full bg-white rounded-r"
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                 />
               )}
