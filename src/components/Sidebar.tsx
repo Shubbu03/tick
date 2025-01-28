@@ -10,7 +10,6 @@ import {
   Settings,
   ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
