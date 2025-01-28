@@ -19,14 +19,13 @@ const navItems = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({isCollapsed,setIsCollapsed}) {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <div
       className={`${
-        isCollapsed ? "w-16" : "w-64"
+        isCollapsed ? "w-16" : "w-60"
       } h-screen bg-gradient-to-b from-teal-500 to-cyan-600 dark:from-teal-950 dark:to-cyan-900 border-r border-white/10 transition-all duration-300 ease-in-out fixed`}
     >
       <motion.button

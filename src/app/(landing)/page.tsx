@@ -6,7 +6,6 @@ import AnimatedBackground from "./components/AnimatedBackground";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
 import Footer from "./components/Footer";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
