@@ -23,7 +23,7 @@ const StatsCard = ({ title, amount }: CardProps) => {
       <CardContent>
         <div className="flex justify-end items-baseline space-x-2">
           <span className="text-4xl font-bold text-foreground">
-            ${amount.toFixed(2)}
+            ₹ {amount.toFixed(2)}
           </span>
         </div>
       </CardContent>
