@@ -10,11 +10,27 @@ import StatsCard from "@/components/StatsCard";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "react-day-picker";
 import SubscriptionCard from "@/components/SubscriptionCard";
+import axios from "axios";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [montlyExpense, setMontlyExpense] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchMonthlyExpense();
+  }, []);
+  const fetchMonthlyExpense = async () => {
+    try {
+      const response = await axios.get("/api/get-monthly-expense");
+      if (response) {
+        setMontlyExpense(response.data.data);
+      }
+    } catch (err) {
+      console.error("Error occured while loading user's montly expense:", err);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -43,7 +59,7 @@ export default function Dashboard() {
         </div>
 
         <div className="flex w-full p-4 gap-4">
-          <StatsCard title="Monthly Expense" amount={10} />
+          <StatsCard title="Monthly Expense" amount={montlyExpense} />
           <StatsCard title="Active Subscription" amount={12} />
           <StatsCard title="Next Payment" amount={29.99} />
         </div>

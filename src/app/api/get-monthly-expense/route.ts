@@ -1,6 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel, { User } from "@/model/User";
-import mongoose from "mongoose";
+import UserModel, { type User } from "@/model/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 
@@ -21,34 +20,28 @@ export async function GET(request: Request) {
   try {
     const user = await UserModel.findById(currentUser._id);
     const expense = user?.monthlyExpense;
-    if (!expense) {
+
+    if (expense === undefined || expense === null) {
       return Response.json(
         {
           success: false,
           message: "Error fetching user's monthly expense!! Please try again",
+          data: expense,
         },
         { status: 400 }
       );
     }
 
-    if (expense == 0) {
-      return Response.json(
-        {
-          success: true,
-          message: "Add subscription to view monthly expense",
-        },
-        { status: 201 }
-      );
-    }
-
-
     return Response.json(
       {
         data: expense,
         success: true,
-        message: "User's monthly expense fetched successfully!!",
+        message:
+          expense === 0
+            ? "Add subscription to view monthly expense"
+            : "User's monthly expense fetched successfully!!",
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (err) {
     return Response.json(
