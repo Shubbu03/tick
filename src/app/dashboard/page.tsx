@@ -11,6 +11,7 @@ import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "react-day-picker";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import axios from "axios";
+import { FaCirclePlus } from "react-icons/fa6";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -63,6 +64,18 @@ export default function Dashboard() {
           <StatsCard title="Active Subscription" amount={12} />
           <StatsCard title="Next Payment" amount={29.99} />
         </div>
+
+        <button
+          onClick={() => {
+            console.log("button clicked");
+            setModalOpen(true);
+          }}
+          className="fixed bottom-8 right-8 p-4 bg-teal-600 hover:bg-teal-700 text-white rounded-full shadow-lg transition-all duration-200 hover:scale-105 flex items-center justify-center"
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+
+        <AddSubscriptionModal open={modalOpen} onOpenChange={setModalOpen} />
       </div>
     </div>
   );
