@@ -12,6 +12,8 @@ import { Button } from "react-day-picker";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import axios from "axios";
 import { FaCirclePlus } from "react-icons/fa6";
+import { Label } from "@radix-ui/react-label";
+import { Separator } from "@radix-ui/react-select";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -34,24 +36,26 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-gray-50 dark:bg-slate-950">
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <div
         className={`flex-1 ${
           isCollapsed ? "pl-16" : "pl-60"
         } transition-all duration-300 ease-in-out`}
       >
-        <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex justify-between items-center p-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
           <div>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
               Hi, {session?.user?.username || ""}! 👋
             </h1>
-            <p className="text-gray-500">Here`s your subscription overview</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Here's your subscription overview
+            </p>
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
             <button
-              className="flex items-center justify-center p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+              className="flex items-center justify-center p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
               onClick={() => signOut({ redirect: true, callbackUrl: "/" })}
             >
               <LogOut className="w-5 h-5" />
@@ -65,17 +69,23 @@ export default function Dashboard() {
           <StatsCard title="Next Payment" amount={29.99} />
         </div>
 
-        <button
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            Recent Subscriptions
+          </h2>
+        </div>
+
+        {/* <button
           onClick={() => {
             console.log("button clicked");
             setModalOpen(true);
           }}
-          className="fixed bottom-8 right-8 p-4 bg-teal-600 hover:bg-teal-700 text-white rounded-full shadow-lg transition-all duration-200 hover:scale-105 flex items-center justify-center"
+          className="fixed bottom-8 right-8 p-4 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white rounded-full shadow-lg transition-all duration-200 hover:scale-105 flex items-center justify-center"
         >
           <Plus className="w-6 h-6" />
         </button>
 
-        <AddSubscriptionModal open={modalOpen} onOpenChange={setModalOpen} />
+        <AddSubscriptionModal open={modalOpen} onOpenChange={setModalOpen} /> */}
       </div>
     </div>
   );
