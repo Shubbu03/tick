@@ -21,6 +21,7 @@ export interface SubscriptionCardProps {
   price: number;
   isActive: boolean;
   autoRenew: boolean;
+  planDuration: string;
 }
 
 const getCategoryIcon = (category: SubscriptionCategory) => {
@@ -54,6 +55,7 @@ const SubscriptionCard = ({
   price,
   isActive,
   autoRenew,
+  planDuration,
 }: SubscriptionCardProps) => {
   const CategoryIcon = getCategoryIcon(category as SubscriptionCategory);
 
@@ -65,7 +67,9 @@ const SubscriptionCard = ({
         </div>
         <div>
           <h3 className="text-2xl font-bold">{name}</h3>
-          <p className="text-sm text-gray-500 font-light">{category}</p>
+          <p className="text-sm text-gray-500 font-light">
+            {category} | {planDuration}
+          </p>
         </div>
       </div>
       <div className="flex flex-col items-end space-y-2">
