@@ -1,21 +1,20 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel, { Subscription, PlanType } from "@/model/User";
+import UserModel, {
+  Subscription,
+  PlanType,
+  SubscriptionCategory,
+} from "@/model/User";
 import { z } from "zod";
-
 
 const subscriptionSchema = z.object({
   username: z.string().min(1, "Username is required"),
   name: z.string().min(1, "Subscription name is required"),
   planSelected: z.string().min(1, "Plan selection is required"),
-  planDuration: z.enum([
-    "Monthly",
-    "Quarterly",
-    "Half_Yearly",
-    "Yearly",
-  ] as const),
+  planDuration: z.nativeEnum(PlanType),
   price: z.number().positive("Price must be positive"),
   dueDate: z.string().datetime("Invalid date format"),
   autoRenew: z.boolean().default(false),
+  category: z.nativeEnum(SubscriptionCategory),
 });
 
 export async function POST(request: Request) {
@@ -54,6 +53,7 @@ export async function POST(request: Request) {
       dueDate: new Date(validatedData.dueDate),
       isActive: true,
       autoRenew: validatedData.autoRenew,
+      category: validatedData.category,
       paymentHistory: [
         {
           amount: validatedData.price,
