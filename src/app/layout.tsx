@@ -4,6 +4,8 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from "@/context/AuthProvider";
 import { ThemeProvider } from "@/providers/theme-provider";
+import LayoutWrapper from "@/components/LayoutWrapper";
+import type React from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,15 +16,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={inter.className}>
         <ThemeProvider>
           <AuthProvider>
-            {children}
+            <LayoutWrapper>{children}</LayoutWrapper>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
