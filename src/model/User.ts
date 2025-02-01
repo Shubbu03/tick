@@ -7,6 +7,18 @@ export enum PlanType {
   Yearly = "Yearly",
 }
 
+export enum SubscriptionCategory {
+  Music = "Music",
+  OTT = "OTT",
+  Fitness = "Fitness",
+  Education = "Education",
+  News = "News",
+  Gaming = "Gaming",
+  CloudStorage = "Cloud Storage",
+  Productivity = "Productivity",
+  ECommerce = "E-Commerce",
+}
+
 export interface Subscription extends Document {
   name: string;
   planSelected: string;
@@ -16,6 +28,7 @@ export interface Subscription extends Document {
   dueDate: Date;
   isActive: boolean;
   autoRenew: boolean;
+  category: SubscriptionCategory;
   paymentHistory: [
     {
       amount: number;
@@ -72,6 +85,11 @@ const subscriptionSchema: Schema<Subscription> = new Schema(
       type: Boolean,
       required: true,
       default: false,
+    },
+    category: {
+      type: String,
+      enum: Object.values(SubscriptionCategory),
+      required: true,
     },
     paymentHistory: [
       {
