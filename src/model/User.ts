@@ -1,34 +1,6 @@
 import { PlanType, SubscriptionCategory } from "@/lib/enums";
+import { Subscription, User } from "@/lib/interfaces";
 import mongoose, { Schema, Document } from "mongoose";
-
-export interface Subscription extends Document {
-  name: string;
-  planSelected: string;
-  planDuration: PlanType;
-  price: number;
-  startDate: Date;
-  dueDate: Date;
-  isActive: boolean;
-  autoRenew: boolean;
-  category: SubscriptionCategory;
-  paymentHistory: [
-    {
-      amount: number;
-      date: Date;
-      status: string;
-    }
-  ];
-}
-
-export interface User extends Document {
-  username: string;
-  email: string;
-  password: string;
-  verifyCode: string;
-  verifyCodeExpiry: Date;
-  monthlyExpense: number;
-  subscription: [Subscription];
-}
 
 const subscriptionSchema: Schema<Subscription> = new Schema(
   {

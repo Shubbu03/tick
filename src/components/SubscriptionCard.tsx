@@ -1,6 +1,7 @@
 "use client";
 
 import { SubscriptionCategory } from "@/lib/enums";
+import { SubscriptionCardProps } from "@/lib/interfaces";
 import {
   Music2,
   Tv,
@@ -14,15 +15,6 @@ import {
   Circle,
   Repeat,
 } from "lucide-react";
-
-export interface SubscriptionCardProps {
-  name: string;
-  category: string;
-  price: number;
-  isActive: boolean;
-  autoRenew: boolean;
-  planDuration: string;
-}
 
 const getCategoryIcon = (category: SubscriptionCategory) => {
   switch (category) {

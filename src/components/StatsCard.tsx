@@ -1,15 +1,5 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-interface CardProps {
-  title: string;
-  amount: number;
-  isMoney?: boolean;
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardProps } from "@/lib/interfaces";
 
 const StatsCard = ({ title, amount, isMoney }: CardProps) => {
   const fixedAmount = amount.toFixed(2);
