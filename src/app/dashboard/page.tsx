@@ -37,7 +37,7 @@ export default function Dashboard() {
   const fetchUserSubscription = async () => {
     try {
       const response = await axios.get("/api/get-subscription");
-      if (response) {
+      if (response && response.status == 200) {
         setUserSubscription(response.data.subscription);
         setTotalSubscription(response.data.subscription.length);
       }
