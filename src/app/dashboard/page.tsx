@@ -5,12 +5,12 @@ import AddSubscriptionModal from "@/components/AddSubscriptionModal";
 import StatsCard from "@/components/StatsCard";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "react-day-picker";
-import SubscriptionCard, {
-  SubscriptionCardProps,
-} from "@/components/SubscriptionCard";
+import SubscriptionCard from "@/components/SubscriptionCard";
 import axios from "axios";
 import { FaCirclePlus } from "react-icons/fa6";
 import { Label } from "@radix-ui/react-label";
+import { SubscriptionCardProps } from "@/lib/interfaces";
+import { Plus } from "lucide-react";
 
 export default function Dashboard() {
   const [montlyExpense, setMontlyExpense] = useState(0);
@@ -56,6 +56,20 @@ export default function Dashboard() {
       price / (divisors[category as keyof typeof divisors] || 1);
     return fixedValue.toFixed(2);
   };
+
+  const handleAddSubscription = async (formData: any) => {
+    try {
+      const response = await axios.post("/api/add-subscription", formData);
+      if (response.status === 200) {
+        // Refresh subscriptions and monthly expense
+        fetchUserSubscription();
+        fetchMonthlyExpense();
+      }
+    } catch (err) {
+      console.error("Error adding subscription:", err);
+    }
+  };
+
   return (
     <div>
       <div className="flex w-full p-4 gap-4">
@@ -88,6 +102,18 @@ export default function Dashboard() {
           planDuration={subs.planDuration}
         />
       ))}
+
+      <Button
+        className="fixed bottom-4 right-4 rounded-full w-12 h-12 p-0"
+        onClick={() => setModalOpen(true)}
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
+      <AddSubscriptionModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        onSubmit={handleAddSubscription}
+      />
     </div>
   );
 }
