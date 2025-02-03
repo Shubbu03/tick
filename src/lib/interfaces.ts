@@ -44,6 +44,7 @@ export interface UserSubscription {
 export interface AddSubscriptionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSubmit?: (formData: any) => void;
 }
 
 export interface CardProps {
