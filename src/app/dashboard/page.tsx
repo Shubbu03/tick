@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AddSubscriptionModal from "@/components/AddSubscriptionModal";
 import StatsCard from "@/components/StatsCard";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
-import { Button } from "react-day-picker";
+import { Button } from "@/components/ui/button";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import axios from "axios";
 import { FaCirclePlus } from "react-icons/fa6";
@@ -104,7 +104,7 @@ export default function Dashboard() {
       ))}
 
       <Button
-        className="fixed bottom-4 right-4 rounded-full w-12 h-12 p-0"
+        className="fixed bottom-4 right-4 rounded-full w-12 h-12 p-0 bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white"
         onClick={() => setModalOpen(true)}
       >
         <Plus className="h-6 w-6" />
