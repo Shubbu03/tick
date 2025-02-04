@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import type { AddSubscriptionModalProps } from "@/lib/interfaces";
+import { Calendar } from "./ui/calendar";
 
 const AddSubscriptionModal: FC<
   AddSubscriptionModalProps & {
@@ -114,19 +115,118 @@ const AddSubscriptionModal: FC<
               placeholder="0.00"
             />
           </div>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="autoRenew"
-              checked={formData.autoRenew}
-              onCheckedChange={(checked) =>
-                handleInputChange("autoRenew", checked)
-              }
-            />
-            <Label htmlFor="autoRenew">Auto Renew</Label>
+          <div className="space-y-2">
+            <Label>Start Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full pl-3 text-left font-normal bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
+                    !formData.startDate && "text-muted-foreground"
+                  )}
+                >
+                  {formData.startDate ? (
+                    format(formData.startDate, "PPP")
+                  ) : (
+                    <span>Pick a start date</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={formData.startDate}
+                  onSelect={(date) => handleInputChange("startDate", date)}
+                  showOutsideDays
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Due Date */}
+          <div className="space-y-2">
+            <Label>Due Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full pl-3 text-left font-normal bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
+                    !formData.nextPaymentDate && "text-muted-foreground"
+                  )}
+                >
+                  {formData.nextPaymentDate ? (
+                    format(formData.nextPaymentDate, "PPP")
+                  ) : (
+                    <span>Pick a due date</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={formData.nextPaymentDate}
+                  onSelect={(date) =>
+                    handleInputChange("nextPaymentDate", date)
+                  }
+                  showOutsideDays
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="active" className="mr-2">
+                Active
+              </Label>
+              <Switch
+                id="active"
+                className="relative w-12 h-6 rounded-full transition-colors duration-300 bg-gray-200 dark:bg-gray-400 data-[state=checked]:bg-teal-500 dark:data-[state=checked]:bg-teal-600"
+                onCheckedChange={(checked) =>
+                  handleInputChange("active", checked)
+                }
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="autoRenew" className="mr-2">
+                Auto Renew
+              </Label>
+              <Switch
+                id="autoRenew"
+                className="relative w-12 h-6 rounded-full transition-colors duration-300 bg-gray-200 dark:bg-gray-400 data-[state=checked]:bg-teal-500 dark:data-[state=checked]:bg-teal-600"
+                onCheckedChange={(checked) =>
+                  handleInputChange("autoRenew", checked)
+                }
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="planDuration">Category</Label>
+            <Select
+              onValueChange={(value) => handleInputChange("category", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <SelectItem value="Music">Music</SelectItem>
+                <SelectItem value="OTT">OTT</SelectItem>
+                <SelectItem value="Fitness">Fitness</SelectItem>
+                <SelectItem value="Education">Education</SelectItem>
+                <SelectItem value="News">News</SelectItem>
+                <SelectItem value="Gaming">Gaming</SelectItem>
+                <SelectItem value="CloudStorage">Cloud Storage</SelectItem>
+                <SelectItem value="Productivity">Productivity</SelectItem>
+                <SelectItem value="ECommerce">E-Commerce</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button type="submit" onClick={handleSubmit}>
-              Save Subscription
+              Save
             </Button>
           </DialogFooter>
         </form>

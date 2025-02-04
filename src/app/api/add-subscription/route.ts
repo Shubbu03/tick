@@ -1,10 +1,8 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel, {
-  Subscription,
-  PlanType,
-  SubscriptionCategory,
-} from "@/model/User";
+import UserModel from "@/model/User";
 import { z } from "zod";
+import { Subscription } from "@/lib/interfaces";
+import { PlanType, SubscriptionCategory } from "@/lib/enums";
 
 const subscriptionSchema = z.object({
   username: z.string().min(1, "Username is required"),
