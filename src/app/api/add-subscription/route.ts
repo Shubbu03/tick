@@ -10,7 +10,7 @@ const subscriptionSchema = z.object({
   planSelected: z.string().min(1, "Plan selection is required"),
   planDuration: z.nativeEnum(PlanType),
   price: z.number().positive("Price must be positive"),
-  dueDate: z.string().datetime("Invalid date format"),
+  dueDate: z.string(),
   autoRenew: z.boolean().default(false),
   category: z.nativeEnum(SubscriptionCategory),
 });

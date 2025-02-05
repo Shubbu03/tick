@@ -57,16 +57,17 @@ export default function Dashboard() {
     return fixedValue.toFixed(2);
   };
 
-  const handleAddSubscription = async (formData: any) => {
+  const handleAddSubscription = async (data: any) => {
     try {
-      const response = await axios.post("/api/add-subscription", formData);
+      const response = await axios.post("/api/add-subscription", data);
       if (response.status === 200) {
-        // Refresh subscriptions and monthly expense
-        fetchUserSubscription();
-        fetchMonthlyExpense();
+        console.log("Subscription added successfully!");
       }
+      await fetchUserSubscription();
+      await fetchMonthlyExpense();
     } catch (err) {
       console.error("Error adding subscription:", err);
+      throw err;
     }
   };
 
@@ -112,7 +113,7 @@ export default function Dashboard() {
       <AddSubscriptionModal
         open={modalOpen}
         onOpenChange={setModalOpen}
-        onSubmit={handleAddSubscription}
+        onAddSubscription={handleAddSubscription}
       />
     </div>
   );

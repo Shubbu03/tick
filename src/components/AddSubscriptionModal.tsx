@@ -1,5 +1,5 @@
-import { type FC, useState, type FormEvent } from "react";
-import { format } from "date-fns";
+import { FC, useState, FormEvent } from "react";
+import { format, isValid } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import {
   Dialog,
@@ -23,28 +23,46 @@ import { cn } from "@/lib/utils";
 import type { AddSubscriptionModalProps } from "@/lib/interfaces";
 import Calendar from "rc-calendar";
 import "rc-calendar/assets/index.css";
+import { z } from "zod";
+import { PlanType, SubscriptionCategory } from "@/lib/enums";
+
+const subscriptionSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  name: z.string().min(1, "Subscription name is required"),
+  planSelected: z.string().min(1, "Plan selection is required"),
+  planDuration: z.nativeEnum(PlanType, {
+    errorMap: () => ({ message: "Plan duration is required" }),
+  }),
+  price: z.number().positive("Price must be positive"),
+  dueDate: z.date(),
+  autoRenew: z.boolean().default(false),
+  category: z.nativeEnum(SubscriptionCategory, {
+    errorMap: () => ({ message: "Category is required" }),
+  }),
+});
 
 const initialFormState = {
+  username: "shubbu03",
   name: "",
   planSelected: "",
-  planDuration: "",
+  planDuration: "" as keyof typeof PlanType,
   price: "",
-  startDate: undefined as Date | undefined,
-  dueDate: undefined as Date | undefined,
+  dueDate: "",
   autoRenew: false,
-  active: false,
-  category: "",
-  username: "shubbu03", // Add a default username or get it from your auth context
+  category: "" as keyof typeof SubscriptionCategory,
 };
 
-const AddSubscriptionModal: FC<
-  AddSubscriptionModalProps & {
-    onSubmit?: (formData: any) => void;
-  }
-> = ({ open, onOpenChange, onSubmit }) => {
+interface ExtendedAddSubscriptionModalProps extends AddSubscriptionModalProps {
+  onAddSubscription: (data: any) => Promise<void>;
+}
+
+const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
+  open,
+  onOpenChange,
+  onAddSubscription,
+}) => {
   const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [startDateOpen, setStartDateOpen] = useState(false);
   const [dueDateOpen, setDueDateOpen] = useState(false);
 
   const handleInputChange = (
@@ -55,65 +73,50 @@ const AddSubscriptionModal: FC<
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name) {
-      newErrors.name = "Subscription name is required";
-    }
-    if (!formData.planSelected) {
-      newErrors.planType = "Plan type is required";
-    }
-    if (!formData.planDuration) {
-      newErrors.planDuration = "Plan duration is required";
-    }
-    if (!formData.price) {
-      newErrors.price = "Price is required";
-    } else if (isNaN(Number(formData.price))) {
-      newErrors.price = "Price must be a valid number";
-    }
-    if (!formData.startDate) {
-      newErrors.startDate = "Start date is required";
-    }
-    if (!formData.dueDate) {
-      newErrors.dueDate = "Due date is required";
-    }
-    if (!formData.category) {
-      newErrors.category = "Category is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const resetForm = () => {
     setFormData(initialFormState);
     setErrors({});
-    setStartDateOpen(false);
     setDueDateOpen(false);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (!formData.dueDate || !isValid(formData.dueDate)) {
+      setErrors((prev) => ({
+        ...prev,
+        dueDate: "Due date is required and must be a valid date",
+      }));
+      return;
+    }
+
+    const rawData = {
+      ...formData,
+      price: Number(formData.price),
+    };
+
+    const result = subscriptionSchema.safeParse(rawData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const key = err.path[0] as string;
+        fieldErrors[key] = err.message;
+      });
+      setErrors(fieldErrors);
       return;
     }
 
     const submissionData = {
-      ...formData,
-      price: Number(formData.price),
-      startDate: formData.startDate
-        ? format(formData.startDate, "yyyy-MM-dd")
-        : undefined,
-      dueDate: formData.dueDate
-        ? format(formData.dueDate, "yyyy-MM-dd")
-        : undefined,
+      ...rawData,
+      dueDate: formData.dueDate,
     };
 
-    if (onSubmit) {
-      console.log("FINAL DATA FROM FROM IS::", submissionData);
-      onSubmit(submissionData);
+    try {
+      await onAddSubscription(submissionData);
+      console.log("Subscription added successfully!");
+    } catch (err) {
+      console.error("Error adding subscription:", err);
+    } finally {
       resetForm();
       onOpenChange(false);
     }
@@ -143,7 +146,7 @@ const AddSubscriptionModal: FC<
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="planSelected">Plan Type</Label>
+            <Label htmlFor="planSelected">Plan Selection</Label>
             <Input
               id="planSelected"
               value={formData.planSelected}
@@ -151,10 +154,10 @@ const AddSubscriptionModal: FC<
                 handleInputChange("planSelected", e.target.value)
               }
               placeholder="Premium.."
-              className={errors.planType ? "border-red-500" : ""}
+              className={errors.planSelected ? "border-red-500" : ""}
             />
-            {errors.planType && (
-              <p className="text-red-500 text-sm">{errors.planType}</p>
+            {errors.planSelected && (
+              <p className="text-red-500 text-sm">{errors.planSelected}</p>
             )}
           </div>
 
@@ -172,10 +175,12 @@ const AddSubscriptionModal: FC<
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <SelectItem value="Monthly">Monthly</SelectItem>
-                <SelectItem value="Quarterly">Quarterly</SelectItem>
-                <SelectItem value="Half_Yearly">Half Yearly</SelectItem>
-                <SelectItem value="Yearly">Yearly</SelectItem>
+                <SelectItem value={PlanType.Monthly}>Monthly</SelectItem>
+                <SelectItem value={PlanType.Quarterly}>Quarterly</SelectItem>
+                <SelectItem value={PlanType.Half_Yearly}>
+                  Half Yearly
+                </SelectItem>
+                <SelectItem value={PlanType.Yearly}>Yearly</SelectItem>
               </SelectContent>
             </Select>
             {errors.planDuration && (
@@ -199,50 +204,6 @@ const AddSubscriptionModal: FC<
           </div>
 
           <div className="space-y-2">
-            <Label>Start Date</Label>
-            <div className="relative">
-              <Button
-                type="button"
-                variant="outline"
-                className={cn(
-                  "w-full pl-3 text-left font-normal bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
-                  !formData.startDate && "text-muted-foreground",
-                  errors.startDate && "border-red-500"
-                )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setStartDateOpen(!startDateOpen);
-                }}
-              >
-                {formData.startDate ? (
-                  format(formData.startDate, "PPP")
-                ) : (
-                  <span>Pick a start date</span>
-                )}
-                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-              </Button>
-              {errors.startDate && (
-                <p className="text-red-500 text-sm">{errors.startDate}</p>
-              )}
-              {startDateOpen && (
-                <div className="absolute z-50 mt-2">
-                  <Calendar
-                    className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-lg"
-                    showToday
-                    showDateInput={false}
-                    value={formData.startDate}
-                    onChange={(date) => {
-                      handleInputChange("startDate", date);
-                      setStartDateOpen(false);
-                    }}
-                    onClose={() => setStartDateOpen(false)}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
             <Label>Due Date</Label>
             <div className="relative">
               <Button
@@ -258,7 +219,7 @@ const AddSubscriptionModal: FC<
                   setDueDateOpen(!dueDateOpen);
                 }}
               >
-                {formData.dueDate ? (
+                {formData.dueDate && isValid(formData.dueDate) ? (
                   format(formData.dueDate, "PPP")
                 ) : (
                   <span>Pick a due date</span>
@@ -274,10 +235,19 @@ const AddSubscriptionModal: FC<
                     className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-lg"
                     showToday
                     showDateInput={false}
-                    value={formData.dueDate}
+                    value={formData.dueDate || null}
                     onChange={(date) => {
-                      handleInputChange("dueDate", date);
-                      setDueDateOpen(false);
+                      const jsDate =
+                        date && typeof date.toDate === "function"
+                          ? date.toDate()
+                          : date instanceof Date
+                          ? date
+                          : null;
+
+                      if (jsDate && isValid(jsDate)) {
+                        handleInputChange("dueDate", jsDate);
+                        setDueDateOpen(false);
+                      }
                     }}
                     onClose={() => setDueDateOpen(false)}
                   />
@@ -287,19 +257,6 @@ const AddSubscriptionModal: FC<
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="active" className="mr-2">
-                Active
-              </Label>
-              <Switch
-                id="active"
-                checked={formData.active}
-                className="relative w-12 h-6 rounded-full transition-colors duration-300 bg-gray-200 dark:bg-gray-400 data-[state=checked]:bg-teal-500 dark:data-[state=checked]:bg-teal-600"
-                onCheckedChange={(checked) =>
-                  handleInputChange("active", checked)
-                }
-              />
-            </div>
             <div className="flex items-center space-x-2">
               <Label htmlFor="autoRenew" className="mr-2">
                 Auto Renew
@@ -327,15 +284,29 @@ const AddSubscriptionModal: FC<
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <SelectItem value="Music">Music</SelectItem>
-                <SelectItem value="OTT">OTT</SelectItem>
-                <SelectItem value="Fitness">Fitness</SelectItem>
-                <SelectItem value="Education">Education</SelectItem>
-                <SelectItem value="News">News</SelectItem>
-                <SelectItem value="Gaming">Gaming</SelectItem>
-                <SelectItem value="CloudStorage">Cloud Storage</SelectItem>
-                <SelectItem value="Productivity">Productivity</SelectItem>
-                <SelectItem value="ECommerce">E-Commerce</SelectItem>
+                <SelectItem value={SubscriptionCategory.Music}>
+                  Music
+                </SelectItem>
+                <SelectItem value={SubscriptionCategory.OTT}>OTT</SelectItem>
+                <SelectItem value={SubscriptionCategory.Fitness}>
+                  Fitness
+                </SelectItem>
+                <SelectItem value={SubscriptionCategory.Education}>
+                  Education
+                </SelectItem>
+                <SelectItem value={SubscriptionCategory.News}>News</SelectItem>
+                <SelectItem value={SubscriptionCategory.Gaming}>
+                  Gaming
+                </SelectItem>
+                <SelectItem value={SubscriptionCategory.CloudStorage}>
+                  Cloud Storage
+                </SelectItem>
+                <SelectItem value={SubscriptionCategory.Productivity}>
+                  Productivity
+                </SelectItem>
+                <SelectItem value={SubscriptionCategory.ECommerce}>
+                  E-Commerce
+                </SelectItem>
               </SelectContent>
             </Select>
             {errors.category && (
