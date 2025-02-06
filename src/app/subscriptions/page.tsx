@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowUpDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SubscriptionCategory } from "@/lib/enums";
+import axios from "axios";
+import SubscriptionCard from "@/components/SubscriptionCard";
+import { UserSubscription, SubscriptionCardProps } from "@/lib/interfaces";
+import AddSubscriptionModal from "@/components/AddSubscriptionModal";
 
 type SortOption = "recent" | "price-asc" | "price-desc" | "alpha";
 
@@ -24,7 +28,11 @@ export default function Subscription() {
   const [selectedCategory, setSelectedCategory] =
     useState<string>(ALL_CATEGORIES);
   const [sortBy, setSortBy] = useState<SortOption>("recent");
-
+  const [userSubscription, setUserSubscription] = useState<UserSubscription[]>(
+    []
+  );
+  const [filteredData, setFilteredData] = useState<UserSubscription[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
@@ -35,6 +43,81 @@ export default function Subscription() {
     { value: "price-desc", label: "Price: High to Low" },
     { value: "alpha", label: "A-Z" },
   ];
+
+  useEffect(() => {
+    fetchUserSubscriptions();
+  }, []);
+
+  useEffect(() => {
+    filterAndSortSubscriptions();
+  }, [userSubscription, searchQuery, selectedCategory, sortBy]);
+
+  const fetchUserSubscriptions = async () => {
+    try {
+      const response = await axios.get("/api/get-subscription");
+      if (response && response.status === 200) {
+        const subscriptions = response.data.subscription;
+        setUserSubscription(subscriptions);
+        setFilteredData(subscriptions);
+      }
+    } catch (err) {
+      console.error("Error occurred while fetching subscriptions:", err);
+    }
+  };
+
+  const handleAddSubscription = async (data: any) => {
+    try {
+      const response = await axios.post("/api/add-subscription", data);
+      if (response.status === 200) {
+        console.log("Subscription added successfully!");
+      }
+      await fetchUserSubscriptions();
+    } catch (err) {
+      console.error("Error adding subscription:", err);
+      throw err;
+    }
+  };
+
+  const filterAndSortSubscriptions = () => {
+    let filtered = [...userSubscription];
+
+    if (searchQuery) {
+      filtered = filtered.filter((sub) =>
+        sub.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (selectedCategory !== ALL_CATEGORIES) {
+      filtered = filtered.filter((sub) => sub.category === selectedCategory);
+    }
+
+    switch (sortBy) {
+      case "price-asc":
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case "alpha":
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "recent":
+        break;
+    }
+
+    setFilteredData(filtered);
+  };
+
+  const getNoResultsMessage = () => {
+    if (searchQuery && selectedCategory !== ALL_CATEGORIES) {
+      return `No subscriptions found matching "${searchQuery}" in ${selectedCategory} category`;
+    } else if (searchQuery) {
+      return `No subscriptions found matching "${searchQuery}"`;
+    } else if (selectedCategory !== ALL_CATEGORIES) {
+      return `No subscriptions found in ${selectedCategory} category`;
+    }
+    return "No subscriptions found";
+  };
 
   return (
     <div className="space-y-4">
@@ -58,6 +141,7 @@ export default function Subscription() {
           <Button
             variant="outline"
             className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
+            onClick={() => setIsModalOpen(true)}
           >
             <Plus className="h-4 w-4" />
             Add New
@@ -123,6 +207,37 @@ export default function Subscription() {
           </SelectContent>
         </Select>
       </div>
+
+      <div className="pt-10 cursor-pointer">
+        {filteredData.length > 0 ? (
+          filteredData.map((subs: SubscriptionCardProps) => (
+            <SubscriptionCard
+              key={subs.name}
+              name={subs.name}
+              category={subs.category}
+              price={subs.price}
+              isActive={subs.isActive}
+              autoRenew={subs.autoRenew}
+              planDuration={subs.planDuration}
+            />
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12">
+            <p className="text-lg text-gray-500 dark:text-gray-400 mb-2">
+              {getNoResultsMessage()}
+            </p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">
+              Try adjusting your search or filter criteria
+            </p>
+          </div>
+        )}
+      </div>
+
+      <AddSubscriptionModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        onAddSubscription={handleAddSubscription}
+      />
     </div>
   );
 }

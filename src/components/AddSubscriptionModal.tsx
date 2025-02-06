@@ -25,6 +25,7 @@ import Calendar from "rc-calendar";
 import "rc-calendar/assets/index.css";
 import { z } from "zod";
 import { PlanType, SubscriptionCategory } from "@/lib/enums";
+import { useSession } from "next-auth/react";
 
 const subscriptionSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -41,17 +42,6 @@ const subscriptionSchema = z.object({
   }),
 });
 
-const initialFormState = {
-  username: "shubbu03",
-  name: "",
-  planSelected: "",
-  planDuration: "" as keyof typeof PlanType,
-  price: "",
-  dueDate: "",
-  autoRenew: false,
-  category: "" as keyof typeof SubscriptionCategory,
-};
-
 interface ExtendedAddSubscriptionModalProps extends AddSubscriptionModalProps {
   onAddSubscription: (data: any) => Promise<void>;
 }
@@ -61,6 +51,20 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
   onOpenChange,
   onAddSubscription,
 }) => {
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  const initialFormState = {
+    username: user?.username,
+    name: "",
+    planSelected: "",
+    planDuration: "" as keyof typeof PlanType,
+    price: "",
+    dueDate: "",
+    autoRenew: false,
+    category: "" as keyof typeof SubscriptionCategory,
+  };
+
   const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [dueDateOpen, setDueDateOpen] = useState(false);
