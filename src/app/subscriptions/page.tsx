@@ -18,6 +18,7 @@ import axios from "axios";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import { UserSubscription, SubscriptionCardProps } from "@/lib/interfaces";
 import AddSubscriptionModal from "@/components/AddSubscriptionModal";
+import * as XLSX from "xlsx";
 
 type SortOption = "recent" | "price-asc" | "price-desc" | "alpha";
 
@@ -70,6 +71,7 @@ export default function Subscription() {
       const response = await axios.post("/api/add-subscription", data);
       if (response.status === 200) {
         console.log("Subscription added successfully!");
+        setIsModalOpen(false);
       }
       await fetchUserSubscriptions();
     } catch (err) {
@@ -119,6 +121,32 @@ export default function Subscription() {
     return "No subscriptions found";
   };
 
+  const exportToExcel = () => {
+    if (filteredData.length === 0) {
+      alert("No subscriptions to export");
+      return;
+    }
+
+    const exportData = filteredData.map((sub) => ({
+      Name: sub.name,
+      Category: sub.category,
+      Price: sub.price,
+      "Active Status": sub.isActive ? "Active" : "Inactive",
+      "Auto Renew": sub.autoRenew ? "Yes" : "No",
+      "Plan Duration": sub.planDuration,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Subscriptions");
+
+    XLSX.writeFile(workbook, "Subscriptions_Export.xlsx", {
+      bookType: "xlsx",
+      type: "buffer",
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center p-4">
@@ -132,6 +160,7 @@ export default function Subscription() {
         </div>
         <div className="flex gap-3">
           <Button
+            onClick={exportToExcel}
             variant="outline"
             className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
           >
@@ -219,6 +248,7 @@ export default function Subscription() {
               isActive={subs.isActive}
               autoRenew={subs.autoRenew}
               planDuration={subs.planDuration}
+              onSubscriptionPage={true}
             />
           ))
         ) : (
