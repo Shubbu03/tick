@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel, { Subscription } from "@/model/User";
+import UserModel from "@/model/User";
+import { Subscription } from "@/lib/interfaces";
 
 export async function DELETE(request: Request) {
   await dbConnect();
@@ -29,7 +30,7 @@ export async function DELETE(request: Request) {
     }
 
     const subscriptionToRemove = user.subscription.find(
-      (sub) => sub.id === subscriptionId
+      (sub) => sub._id === subscriptionId
     );
 
     if (!subscriptionToRemove) {
@@ -50,7 +51,7 @@ export async function DELETE(request: Request) {
     user.monthlyExpense -= subscriptionToRemove.price / divisor;
 
     user.subscription = user.subscription.filter(
-      (sub) => sub.id !== subscriptionId
+      (sub) => sub._id !== subscriptionId
     ) as [Subscription];
 
     await user.save();
