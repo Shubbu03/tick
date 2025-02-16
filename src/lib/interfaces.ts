@@ -51,6 +51,7 @@ export interface CardProps {
   title: string;
   amount: number;
   isMoney?: boolean;
+  date?: Date | null;
 }
 
 export interface SubscriptionCardProps {
