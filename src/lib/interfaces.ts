@@ -60,5 +60,6 @@ export interface SubscriptionCardProps {
   isActive: boolean;
   autoRenew: boolean;
   planDuration: string;
+  dueDate: string;
   onSubscriptionPage?: boolean;
 }
