@@ -19,6 +19,7 @@ import SubscriptionCard from "@/components/SubscriptionCard";
 import { UserSubscription, SubscriptionCardProps } from "@/lib/interfaces";
 import AddSubscriptionModal from "@/components/AddSubscriptionModal";
 import * as XLSX from "xlsx";
+import formatLocaleDate from "@/lib/formatToLocaleDate";
 
 type SortOption = "recent" | "price-asc" | "price-desc" | "alpha";
 
@@ -248,6 +249,7 @@ export default function Subscription() {
               isActive={subs.isActive}
               autoRenew={subs.autoRenew}
               planDuration={subs.planDuration}
+              dueDate={formatLocaleDate(subs.dueDate)}
               onSubscriptionPage={true}
             />
           ))
