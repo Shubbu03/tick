@@ -11,6 +11,7 @@ import { FaCirclePlus } from "react-icons/fa6";
 import { Label } from "@radix-ui/react-label";
 import { SubscriptionCardProps } from "@/lib/interfaces";
 import { Plus } from "lucide-react";
+import getNextPayment from "@/hooks/getNextPayment";
 
 export default function Dashboard() {
   const [montlyExpense, setMontlyExpense] = useState(0);
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [totalSubscription, setTotalSubscription] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const nextPayment = getNextPayment(userSubscription);
   useEffect(() => {
     fetchMonthlyExpense();
     fetchUserSubscription();
@@ -84,7 +86,12 @@ export default function Dashboard() {
           amount={totalSubscription}
           isMoney={false}
         />
-        <StatsCard title="Next Payment" amount={29.99} isMoney={true} />
+        <StatsCard
+          title="Next Payment"
+          amount={nextPayment.amount}
+          date={nextPayment.date}
+          isMoney={true}
+        />
       </div>
 
       <div className="p-6">
