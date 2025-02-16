@@ -48,6 +48,8 @@ const SubscriptionCard = ({
   isActive,
   autoRenew,
   planDuration,
+  dueDate,
+  onSubscriptionPage,
 }: SubscriptionCardProps) => {
   const CategoryIcon = getCategoryIcon(category as SubscriptionCategory);
 
@@ -64,15 +66,21 @@ const SubscriptionCard = ({
           </p>
         </div>
       </div>
-      <div className="flex flex-col items-end space-y-2">
-        <div className="flex items-center space-x-2">
-          {isActive && (
-            <Circle className="w-4 h-4 text-green-500 fill-current" />
-          )}
-          {autoRenew && <Repeat className="w-4 h-4 text-gray-500" />}
+      {!onSubscriptionPage ? (
+        <div className="flex flex-col items-end space-y-2">
+          <div className="flex items-center space-x-2">
+            {isActive && (
+              <Circle className="w-4 h-4 text-green-500 fill-current" />
+            )}
+            {autoRenew && <Repeat className="w-4 h-4 text-gray-500" />}
+          </div>
+          <p className="font-medium">₹{price}/mo</p>
         </div>
-        <p className="font-medium">₹{price}/mo</p>
-      </div>
+      ) : (
+        <div className="flex items-baseline space-y-2">
+          <p className="text-sm text-gray-500">Next payment: {dueDate}</p>
+        </div>
+      )}
     </div>
   );
 };
