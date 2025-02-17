@@ -42,6 +42,7 @@ const getCategoryIcon = (category: SubscriptionCategory) => {
 };
 
 const SubscriptionCard = ({
+  _id,
   name,
   category,
   price,
@@ -50,11 +51,21 @@ const SubscriptionCard = ({
   planDuration,
   dueDate,
   onSubscriptionPage,
+  onClick,
 }: SubscriptionCardProps) => {
   const CategoryIcon = getCategoryIcon(category as SubscriptionCategory);
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick(_id);
+    }
+  };
+
   return (
-    <div className="flex items-center ml-4 mr-4 justify-between p-4 bg-white dark:bg-gray-800 rounded-xl shadow mb-4 transition-all duration-200 border border-transparent hover:border-gray-300 hover:-translate-y-1 hover:shadow-md">
+    <div
+      className="flex items-center ml-4 mr-4 justify-between p-4 bg-white dark:bg-gray-800 rounded-xl shadow mb-4 transition-all duration-200 border border-transparent hover:border-gray-300 hover:-translate-y-1 hover:shadow-md"
+      onClick={handleClick}
+    >
       <div className="flex items-center space-x-4">
         <div className="p-2 rounded-[0.5rem] bg-blue-50 dark:bg-blue-900">
           <CategoryIcon className="w-5 h-5 text-gray-600" />
