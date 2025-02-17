@@ -30,6 +30,7 @@ export interface User extends Document {
 }
 
 export interface UserSubscription {
+  _id: string;
   name: string;
   planSelected: string;
   planDuration: string;
@@ -55,6 +56,7 @@ export interface CardProps {
 }
 
 export interface SubscriptionCardProps {
+  _id: string;
   name: string;
   category: string;
   price: number;
@@ -63,4 +65,5 @@ export interface SubscriptionCardProps {
   planDuration: string;
   dueDate: string;
   onSubscriptionPage?: boolean;
+  onClick?: (id: string) => void;
 }
