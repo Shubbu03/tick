@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel, { User } from "@/model/User";
+import UserModel from "@/model/User";
+import { User } from "@/lib/interfaces";
 import mongoose, { mongo, ObjectId } from "mongoose";
 
 export async function PUT(request: Request) {
@@ -16,8 +17,17 @@ export async function PUT(request: Request) {
       );
     }
 
-    const { name, subscriptionId, planSelected, planDuration, price, dueDate } =
-      await request.json();
+    const {
+      name,
+      _id: subscriptionId,
+      planSelected,
+      planDuration,
+      price,
+      dueDate,
+      category,
+      isActive,
+      autoRenew,
+    } = await request.json();
 
     if (
       !name ||
@@ -25,7 +35,8 @@ export async function PUT(request: Request) {
       !planSelected ||
       !planDuration ||
       !price ||
-      !dueDate
+      !dueDate ||
+      !category
     ) {
       return Response.json(
         { success: false, message: "Missing required fields" },
@@ -68,12 +79,13 @@ export async function PUT(request: Request) {
     user.subscription[subscriptionIndex] = {
       _id: oldSubscription._id,
       name,
-      planSelected,
+      category,
+      planSelected: planSelected || oldSubscription.planSelected,
       planDuration,
       price,
       dueDate,
-      isActive: true,
-      autoRenew: oldSubscription.autoRenew,
+      isActive: isActive ?? oldSubscription.isActive,
+      autoRenew: autoRenew ?? oldSubscription.autoRenew,
       paymentHistory: oldSubscription.paymentHistory,
       startDate: oldSubscription.startDate,
     } as any;
