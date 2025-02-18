@@ -59,8 +59,8 @@ export default function SubscriptionDetail({
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="h-full">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 h-full">
               <h2 className="text-xl font-semibold mb-6 text-gray-800 dark:text-gray-200">
                 Basic Information
               </h2>
@@ -74,7 +74,7 @@ export default function SubscriptionDetail({
                     onChange={(e) =>
                       setEditForm({ ...editForm, name: e.target.value })
                     }
-                    className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-lg"
+                    className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-2xl"
                   />
                 </div>
 
@@ -88,10 +88,10 @@ export default function SubscriptionDetail({
                       setEditForm({ ...editForm, category: value })
                     }
                   >
-                    <SelectTrigger className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-lg">
+                    <SelectTrigger className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-2xl">
                       <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
                       {Object.values(SubscriptionCategory).map((category) => (
                         <SelectItem key={category} value={category}>
                           {category}
@@ -114,15 +114,15 @@ export default function SubscriptionDetail({
                         price: parseFloat(e.target.value),
                       })
                     }
-                    className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-lg"
+                    className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-2xl"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="h-full">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 h-full">
               <h2 className="text-xl font-semibold mb-6 text-gray-800 dark:text-gray-200">
                 Subscription Details
               </h2>
@@ -132,15 +132,15 @@ export default function SubscriptionDetail({
                     Plan Duration
                   </label>
                   <Select
-                    value={editForm.category}
+                    value={editForm.planDuration}
                     onValueChange={(value) =>
                       setEditForm({ ...editForm, planDuration: value })
                     }
                   >
-                    <SelectTrigger className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-lg">
+                    <SelectTrigger className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-2xl">
                       <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
                       {Object.values(PlanType).map((category) => (
                         <SelectItem key={category} value={category}>
                           {category}
@@ -167,7 +167,7 @@ export default function SubscriptionDetail({
                         dueDate: new Date(e.target.value).toDateString(),
                       })
                     }
-                    className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-lg"
+                    className="border-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200 rounded-2xl"
                   />
                 </div>
 
