@@ -156,7 +156,6 @@ export default function Subscription() {
     try {
       const response = await axios.get(`/api/subscription/${subscriptionID}`);
       if (response && response.status === 200) {
-        console.log(response.data.subscription);
         setSelectedSubscription(response.data.subscription);
         setEditForm(response.data.subscription);
         setViewMode("detail");
