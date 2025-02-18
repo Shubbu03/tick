@@ -21,6 +21,7 @@ import AddSubscriptionModal from "@/components/AddSubscriptionModal";
 import * as XLSX from "xlsx";
 import formatLocaleDate from "@/lib/formatToLocaleDate";
 import SubscriptionDetail from "@/components/SubscriptionDetail";
+import { useSession } from "next-auth/react";
 
 type SortOption = "recent" | "price-asc" | "price-desc" | "alpha";
 type ViewMode = "list" | "detail";
@@ -45,12 +46,9 @@ export default function Subscription() {
     setSearchQuery(query);
   };
 
-  const sortOptions = [
-    { value: "recent", label: "Most Recent" },
-    { value: "price-asc", label: "Price: Low to High" },
-    { value: "price-desc", label: "Price: High to Low" },
-    { value: "alpha", label: "A-Z" },
-  ];
+  const { data: session } = useSession();
+  const user = session?.user;
+  const userID = user?._id;
 
   useEffect(() => {
     fetchUserSubscriptions();
@@ -158,7 +156,7 @@ export default function Subscription() {
     try {
       const response = await axios.get(`/api/subscription/${subscriptionID}`);
       if (response && response.status === 200) {
-        console.log(response.data.subscription)
+        console.log(response.data.subscription);
         setSelectedSubscription(response.data.subscription);
         setEditForm(response.data.subscription);
         setViewMode("detail");
@@ -177,7 +175,7 @@ export default function Subscription() {
   const handleUpdateSubscription = async () => {
     try {
       const response = await axios.put(
-        `/api/subscription/${selectedSubscription?._id}`,
+        `/api/edit-subscription?id=${userID}`,
         editForm
       );
       if (response.status === 200) {
@@ -189,17 +187,24 @@ export default function Subscription() {
     }
   };
 
-  const handleDeleteSubscription = async () => {
+  const handleDeleteSubscription = async (subscriptionId: any) => {
     if (!window.confirm("Are you sure you want to delete this subscription?"))
       return;
-
     try {
       const response = await axios.delete(
-        `/api/subscription/${selectedSubscription?._id}`
+        `/api/delete-subscription/${userID}`,
+        {
+          data: { subscriptionId },
+        }
       );
-      if (response.status === 200) {
+
+      const data = response.data;
+
+      if (data.success) {
         await fetchUserSubscriptions();
         handleBackToList();
+      } else {
+        alert(data.message || "Failed to delete subscription");
       }
     } catch (err) {
       console.error("Error deleting subscription:", err);
@@ -346,7 +351,7 @@ export default function Subscription() {
           editForm={editForm}
           setEditForm={setEditForm}
           onBack={handleBackToList}
-          onDelete={handleDeleteSubscription}
+          onDelete={() => handleDeleteSubscription(editForm._id)}
           onUpdate={handleUpdateSubscription}
         />
       )}
