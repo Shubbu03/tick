@@ -12,18 +12,34 @@ import { Label } from "@radix-ui/react-label";
 import { SubscriptionCardProps } from "@/lib/interfaces";
 import { Plus } from "lucide-react";
 import getNextPayment from "@/hooks/getNextPayment";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function Dashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [montlyExpense, setMontlyExpense] = useState(0);
   const [userSubscription, setUserSubscription] = useState([]);
   const [totalSubscription, setTotalSubscription] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
 
   const nextPayment = getNextPayment(userSubscription);
+
   useEffect(() => {
-    fetchMonthlyExpense();
-    fetchUserSubscription();
-  }, []);
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (status === "authenticated") {
+      setLoading(false);
+      fetchData();
+    }
+  }, [status, router]);
+
+  const fetchData = async () => {
+    await Promise.all([fetchMonthlyExpense(), fetchUserSubscription()]);
+    setLoading(false);
+  };
 
   const fetchMonthlyExpense = async () => {
     try {
@@ -72,6 +88,14 @@ export default function Dashboard() {
       throw err;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div>

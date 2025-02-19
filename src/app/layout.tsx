@@ -6,6 +6,7 @@ import AuthProvider from "@/context/AuthProvider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import type React from "react";
+import ClientLayoutSelector from "./ClientLayoutSelector";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <AuthProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
+            <ClientLayoutSelector>{children}</ClientLayoutSelector>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
