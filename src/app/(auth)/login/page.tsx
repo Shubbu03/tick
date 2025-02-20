@@ -33,7 +33,7 @@ export default function Login() {
   const { toast } = useToast();
   const onSubmit = async (data: z.infer<typeof signinSchema>) => {
     const result = await signIn("credentials", {
-      redirect: false,
+      redirect: true,
       identifier: data.identifier,
       password: data.password,
     });
@@ -61,8 +61,7 @@ export default function Login() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden">
-      <div className="absolute top-4 right-4">
-      </div>
+      <div className="absolute top-4 right-4"></div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
