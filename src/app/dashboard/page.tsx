@@ -98,49 +98,78 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
-      <div className="flex w-full p-4 gap-4">
-        <StatsCard
-          title="Monthly Expense"
-          amount={montlyExpense}
-          isMoney={true}
-        />
-        <StatsCard
-          title="Active Subscription"
-          amount={totalSubscription}
-          isMoney={false}
-        />
-        <StatsCard
-          title="Next Payment"
-          amount={nextPayment.amount}
-          date={nextPayment.date}
-          isMoney={true}
-        />
-      </div>
+    <div className="flex flex-col h-full">
+      {totalSubscription > 0 ? (
+        <>
+          <div className="flex w-full p-4 gap-4">
+            <StatsCard
+              title="Monthly Expense"
+              amount={montlyExpense}
+              isMoney={true}
+            />
+            <StatsCard
+              title="Active Subscription"
+              amount={totalSubscription}
+              isMoney={false}
+            />
+            <StatsCard
+              title="Next Payment"
+              amount={nextPayment.amount}
+              date={nextPayment.date}
+              isMoney={true}
+            />
+          </div>
 
-      <div className="p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Recent Subscriptions
-        </h2>
-      </div>
-      {userSubscription.map((subs: SubscriptionCardProps) => (
-        <SubscriptionCard
-          key={subs.name}
-          name={subs.name}
-          category={subs.category}
-          price={getMonthlySubscriptionPrice(subs.price, subs.planDuration)}
-          isActive={subs.isActive}
-          autoRenew={subs.autoRenew}
-          planDuration={subs.planDuration}
-        />
-      ))}
+          <div className="p-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              Recent Subscriptions
+            </h2>
+          </div>
+          <div className="flex-1">
+            {userSubscription.map((subs: SubscriptionCardProps) => (
+              <SubscriptionCard
+                key={subs.name}
+                name={subs.name}
+                category={subs.category}
+                price={getMonthlySubscriptionPrice(
+                  subs.price,
+                  subs.planDuration
+                )}
+                isActive={subs.isActive}
+                autoRenew={subs.autoRenew}
+                planDuration={subs.planDuration}
+              />
+            ))}
+          </div>
 
-      <Button
-        className="fixed bottom-4 right-4 rounded-full w-12 h-12 p-0 bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white"
-        onClick={() => setModalOpen(true)}
-      >
-        <Plus className="h-6 w-6" />
-      </Button>
+          <Button
+            className="fixed bottom-4 right-4 rounded-full w-12 h-12 p-0 bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white"
+            onClick={() => setModalOpen(true)}
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
+        </>
+      ) : (
+        <div className="flex items-center justify-center p-[200px]">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              No Subscriptions Found
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 max-w-md">
+              You haven`t added any subscriptions yet. Click the button below to
+              get started tracking your expenses.
+            </p>
+            <Button
+              className="mt-6 bg-teal-500 hover:bg-teal-600 text-white rounded-xl"
+              onClick={() => setModalOpen(true)}
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Add Your First Subscription
+            </Button>
+          </div>
+        </div>
+      )}
+
       <AddSubscriptionModal
         open={modalOpen}
         onOpenChange={setModalOpen}
