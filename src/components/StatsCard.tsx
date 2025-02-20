@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import formatLocaleDate from "@/lib/formatToLocaleDate";
 import { CardProps } from "@/lib/interfaces";
 
 const StatsCard = ({ title, amount, isMoney, date }: CardProps) => {
@@ -17,12 +18,7 @@ const StatsCard = ({ title, amount, isMoney, date }: CardProps) => {
           </span>
           {date && (
             <span className="text-sm text-muted-foreground">
-              Due on{" "}
-              {date.toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
+              Due on {formatLocaleDate(date)}
             </span>
           )}
         </div>

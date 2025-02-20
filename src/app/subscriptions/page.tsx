@@ -200,6 +200,14 @@ export default function Subscription() {
       const data = response.data;
 
       if (data.success) {
+        const updatedSubscriptions = userSubscription.filter(
+          (sub) => sub._id !== subscriptionId
+        );
+        setUserSubscription(updatedSubscriptions);
+
+        setFilteredData((prev) =>
+          prev.filter((sub) => sub._id !== subscriptionId)
+        );
         await fetchUserSubscriptions();
         handleBackToList();
       } else {
