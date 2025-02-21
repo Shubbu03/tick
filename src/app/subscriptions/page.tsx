@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowUpDown, Plus } from "lucide-react";
+import { useEffect, useId, useState } from "react";
+import { ArrowUpDown, Plus, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,6 +22,13 @@ import * as XLSX from "xlsx";
 import formatLocaleDate from "@/lib/formatToLocaleDate";
 import SubscriptionDetail from "@/components/SubscriptionDetail";
 import { useSession } from "next-auth/react";
+import { DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@radix-ui/react-dialog";
 
 type SortOption = "recent" | "price-asc" | "price-desc" | "alpha";
 type ViewMode = "list" | "detail";
@@ -41,6 +48,7 @@ export default function Subscription() {
   );
   const [filteredData, setFilteredData] = useState<UserSubscription[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserSubscription>>({});
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -218,6 +226,23 @@ export default function Subscription() {
     }
   };
 
+  const handleDeleteAllSubscription = async () => {
+    try {
+      const resposne = await axios.delete(
+        `/api/delete-all-subscriptions?id=${userID}`
+      );
+
+      if (resposne.status === 200) {
+        setUserSubscription([]);
+        setIsDeleteAllModalOpen(false);
+        setFilteredData([]);
+        await fetchUserSubscriptions();
+      }
+    } catch (err) {
+      console.error("Error deleting subscription:", err);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {viewMode === "list" ? (
@@ -232,22 +257,34 @@ export default function Subscription() {
               </p>
             </div>
             <div className="flex gap-3">
-              <Button
-                onClick={exportToExcel}
-                variant="outline"
-                className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-                Export
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
-                onClick={() => setIsModalOpen(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Add New
-              </Button>
+              {userSubscription.length > 0 && (
+                <>
+                  <Button
+                    onClick={() => setIsDeleteAllModalOpen(true)}
+                    variant="outline"
+                    className="flex items-center gap-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 border-red-300 dark:bg-red-800 dark:hover:bg-red-700 dark:text-red-100 dark:border-red-600"
+                  >
+                    <Trash className="h-4 w-4" />
+                    Delete All
+                  </Button>
+                  <Button
+                    onClick={exportToExcel}
+                    variant="outline"
+                    className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
+                  >
+                    <ArrowUpDown className="h-4 w-4" />
+                    Export
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add New
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -352,6 +389,40 @@ export default function Subscription() {
             onOpenChange={setIsModalOpen}
             onAddSubscription={handleAddSubscription}
           />
+
+          <Dialog
+            open={isDeleteAllModalOpen}
+            onOpenChange={setIsDeleteAllModalOpen}
+          >
+            <DialogContent className="sm:max-w-md fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <DialogHeader>
+                <DialogTitle className="p-4">
+                  Delete All Subscriptions
+                </DialogTitle>
+                <DialogDescription className="p-4">
+                  Do you really wanna delete all subscriptions?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  className="cursor-pointer"
+                  variant="ghost"
+                  onClick={() => setIsDeleteAllModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="cursor-pointer"
+                  variant="destructive"
+                  onClick={async () => {
+                    await handleDeleteAllSubscription();
+                  }}
+                >
+                  Delete All
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </>
       ) : (
         <SubscriptionDetail
