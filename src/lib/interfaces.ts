@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
 import { PlanType, SubscriptionCategory } from "./enums";
 
 export interface Subscription extends Document {
+  _id?: mongoose.Types.ObjectId | string;
   name: string;
   planSelected: string;
   planDuration: PlanType;
