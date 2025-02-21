@@ -131,13 +131,14 @@ export default function Dashboard() {
                 key={subs.name}
                 name={subs.name}
                 category={subs.category}
-                price={getMonthlySubscriptionPrice(
-                  subs.price,
-                  subs.planDuration
+                price={Number(
+                  getMonthlySubscriptionPrice(subs.price, subs.planDuration)
                 )}
                 isActive={subs.isActive}
                 autoRenew={subs.autoRenew}
                 planDuration={subs.planDuration}
+                _id={""}
+                dueDate={""}
               />
             ))}
           </div>
