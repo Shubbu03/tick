@@ -26,6 +26,7 @@ import "rc-calendar/assets/index.css";
 import { z } from "zod";
 import { PlanType, SubscriptionCategory } from "@/lib/enums";
 import { useSession } from "next-auth/react";
+import moment from "moment";
 
 const subscriptionSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -239,7 +240,9 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
                     className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-lg"
                     showToday
                     showDateInput={false}
-                    value={formData.dueDate || null}
+                    value={
+                      formData.dueDate ? moment(formData.dueDate) : undefined
+                    }
                     onChange={(date) => {
                       const jsDate =
                         date && typeof date.toDate === "function"
@@ -253,7 +256,6 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
                         setDueDateOpen(false);
                       }
                     }}
-                    onClose={() => setDueDateOpen(false)}
                   />
                 </div>
               )}
