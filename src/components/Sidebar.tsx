@@ -18,7 +18,7 @@ const navItems = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export default function Sidebar({isCollapsed,setIsCollapsed}) {
+export default function Sidebar({isCollapsed, setIsCollapsed}: {isCollapsed: boolean, setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>}) {
   const pathname = usePathname();
 
   return (
