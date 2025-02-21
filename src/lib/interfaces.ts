@@ -22,6 +22,7 @@ export interface Subscription extends Document {
 }
 
 export interface User extends Document {
+  _id?: mongoose.Types.ObjectId | string;
   username: string;
   email: string;
   password: string;
