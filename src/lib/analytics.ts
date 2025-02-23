@@ -2,7 +2,7 @@ import { MonthlySpendingData, CategoryDistributionData } from "@/types/analytics
 import { Subscription } from "./interfaces";
 
 /**
- * Formats a number as currency in USD
+ * Formats a number as currency in INR
  * @param amount - The amount to format
  * @param options - Formatting options
  * @returns Formatted currency string
@@ -18,13 +18,13 @@ export const formatCurrency = (
 
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
 
   const formatted = formatter.format(amount);
-  return includeSymbol ? formatted : formatted.replace("$", "");
+  return includeSymbol ? formatted : formatted.replace("₹", "");
 };
 
 /**
@@ -37,7 +37,7 @@ export const formatPercentage = (
   value: number,
   decimals: number = 1
 ): string => {
-  return `${value.toFixed(decimals)}%`;
+  return `${value.toFixed(2)}%`;
 };
 
 /**
