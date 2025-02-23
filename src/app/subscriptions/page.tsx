@@ -244,195 +244,197 @@ export default function Subscription() {
   };
 
   return (
-    <div className="space-y-4">
-      {viewMode === "list" ? (
-        <>
-          <div className="flex justify-between items-center p-4">
-            <div>
-              <h2 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">
-                Subscription Details
-              </h2>
-              <p className="text-lg text-gray-500 dark:text-gray-400 mt-1">
-                Manage and track your subscriptions
-              </p>
+    <div className="bg-white dark:bg-gray-900 min-h-screen">
+      <div className="space-y-4">
+        {viewMode === "list" ? (
+          <>
+            <div className="flex justify-between items-center p-4">
+              <div>
+                <h2 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">
+                  Subscription Details
+                </h2>
+                <p className="text-lg text-gray-500 dark:text-gray-400 mt-1">
+                  Manage and track your subscriptions
+                </p>
+              </div>
+              <div className="flex gap-3">
+                {userSubscription.length > 0 && (
+                  <>
+                    <Button
+                      onClick={() => setIsDeleteAllModalOpen(true)}
+                      variant="outline"
+                      className="flex items-center gap-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 border-red-300 dark:bg-red-800 dark:hover:bg-red-700 dark:text-red-100 dark:border-red-600"
+                    >
+                      <Trash className="h-4 w-4" />
+                      Delete All
+                    </Button>
+                    <Button
+                      onClick={exportToExcel}
+                      variant="outline"
+                      className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
+                    >
+                      <ArrowUpDown className="h-4 w-4" />
+                      Export
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add New
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="flex gap-3">
-              {userSubscription.length > 0 && (
-                <>
-                  <Button
-                    onClick={() => setIsDeleteAllModalOpen(true)}
-                    variant="outline"
-                    className="flex items-center gap-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 border-red-300 dark:bg-red-800 dark:hover:bg-red-700 dark:text-red-100 dark:border-red-600"
-                  >
-                    <Trash className="h-4 w-4" />
-                    Delete All
-                  </Button>
-                  <Button
-                    onClick={exportToExcel}
-                    variant="outline"
-                    className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                    Export
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300 dark:bg-teal-800 dark:hover:bg-teal-700 dark:text-teal-100 dark:border-teal-600"
-                    onClick={() => setIsModalOpen(true)}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add New
-                  </Button>
-                </>
+
+            <div className="p-4 flex gap-4">
+              <Input
+                placeholder="Search here..."
+                className="w-4/5 rounded-[0.5rem]"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
+                <SelectTrigger className="w-[180px] rounded-[0.5rem] cursor-pointer">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  <SelectGroup>
+                    <SelectLabel className="px-2 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      Categories
+                    </SelectLabel>
+                    <SelectItem className="cursor-pointer" value="all">
+                      All Categories
+                    </SelectItem>
+                    {Object.values(SubscriptionCategory).map((category) => (
+                      <SelectItem
+                        className="cursor-pointer"
+                        key={category}
+                        value={category}
+                      >
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={sortBy}
+                onValueChange={(value) => setSortBy(value as SortOption)}
+              >
+                <SelectTrigger className="w-[180px] rounded-[0.5rem] cursor-pointer">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  <SelectGroup>
+                    <SelectLabel className="px-2 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      Sort By
+                    </SelectLabel>
+                    {[
+                      { value: "recent", label: "Most Recent" },
+                      { value: "price-asc", label: "Price: Low to High" },
+                      { value: "price-desc", label: "Price: High to Low" },
+                      { value: "alpha", label: "A-Z" },
+                    ].map((option) => (
+                      <SelectItem
+                        className="cursor-pointer"
+                        key={option.value}
+                        value={option.value}
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="pt-10 cursor-pointer">
+              {filteredData.length > 0 ? (
+                filteredData.map((subs: SubscriptionCardProps) => (
+                  <SubscriptionCard
+                    key={subs._id}
+                    _id={subs._id}
+                    name={subs.name}
+                    category={subs.category}
+                    price={subs.price}
+                    isActive={subs.isActive}
+                    autoRenew={subs.autoRenew}
+                    planDuration={subs.planDuration}
+                    dueDate={formatLocaleDate(subs.dueDate)}
+                    onSubscriptionPage={true}
+                    onClick={() => handleSubscriptionClick(subs._id)}
+                  />
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <p className="text-lg text-gray-500 dark:text-gray-400 mb-2">
+                    {getNoResultsMessage()}
+                  </p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                    Try adjusting your search or filter criteria
+                  </p>
+                </div>
               )}
             </div>
-          </div>
 
-          <div className="p-4 flex gap-4">
-            <Input
-              placeholder="Search here..."
-              className="w-4/5 rounded-[0.5rem]"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
+            <AddSubscriptionModal
+              open={isModalOpen}
+              onOpenChange={setIsModalOpen}
+              onAddSubscription={handleAddSubscription}
             />
 
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
+            <Dialog
+              open={isDeleteAllModalOpen}
+              onOpenChange={setIsDeleteAllModalOpen}
             >
-              <SelectTrigger className="w-[180px] rounded-[0.5rem] cursor-pointer">
-                <SelectValue placeholder="Select Category" />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <SelectGroup>
-                  <SelectLabel className="px-2 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                    Categories
-                  </SelectLabel>
-                  <SelectItem className="cursor-pointer" value="all">
-                    All Categories
-                  </SelectItem>
-                  {Object.values(SubscriptionCategory).map((category) => (
-                    <SelectItem
-                      className="cursor-pointer"
-                      key={category}
-                      value={category}
-                    >
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={sortBy}
-              onValueChange={(value) => setSortBy(value as SortOption)}
-            >
-              <SelectTrigger className="w-[180px] rounded-[0.5rem] cursor-pointer">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <SelectGroup>
-                  <SelectLabel className="px-2 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                    Sort By
-                  </SelectLabel>
-                  {[
-                    { value: "recent", label: "Most Recent" },
-                    { value: "price-asc", label: "Price: Low to High" },
-                    { value: "price-desc", label: "Price: High to Low" },
-                    { value: "alpha", label: "A-Z" },
-                  ].map((option) => (
-                    <SelectItem
-                      className="cursor-pointer"
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="pt-10 cursor-pointer">
-            {filteredData.length > 0 ? (
-              filteredData.map((subs: SubscriptionCardProps) => (
-                <SubscriptionCard
-                  key={subs._id}
-                  _id={subs._id}
-                  name={subs.name}
-                  category={subs.category}
-                  price={subs.price}
-                  isActive={subs.isActive}
-                  autoRenew={subs.autoRenew}
-                  planDuration={subs.planDuration}
-                  dueDate={formatLocaleDate(subs.dueDate)}
-                  onSubscriptionPage={true}
-                  onClick={() => handleSubscriptionClick(subs._id)}
-                />
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12">
-                <p className="text-lg text-gray-500 dark:text-gray-400 mb-2">
-                  {getNoResultsMessage()}
-                </p>
-                <p className="text-sm text-gray-400 dark:text-gray-500">
-                  Try adjusting your search or filter criteria
-                </p>
-              </div>
-            )}
-          </div>
-
-          <AddSubscriptionModal
-            open={isModalOpen}
-            onOpenChange={setIsModalOpen}
-            onAddSubscription={handleAddSubscription}
+              <DialogContent className="sm:max-w-md fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <DialogHeader>
+                  <DialogTitle className="p-4">
+                    Delete All Subscriptions
+                  </DialogTitle>
+                  <DialogDescription className="p-4">
+                    Do you really wanna delete all subscriptions?
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button
+                    className="cursor-pointer"
+                    variant="ghost"
+                    onClick={() => setIsDeleteAllModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="cursor-pointer"
+                    variant="destructive"
+                    onClick={async () => {
+                      await handleDeleteAllSubscription();
+                    }}
+                  >
+                    Delete All
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </>
+        ) : (
+          <SubscriptionDetail
+            editForm={editForm}
+            setEditForm={setEditForm}
+            onBack={handleBackToList}
+            onDelete={() => handleDeleteSubscription(editForm._id)}
+            onUpdate={handleUpdateSubscription}
           />
-
-          <Dialog
-            open={isDeleteAllModalOpen}
-            onOpenChange={setIsDeleteAllModalOpen}
-          >
-            <DialogContent className="sm:max-w-md fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <DialogHeader>
-                <DialogTitle className="p-4">
-                  Delete All Subscriptions
-                </DialogTitle>
-                <DialogDescription className="p-4">
-                  Do you really wanna delete all subscriptions?
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  className="cursor-pointer"
-                  variant="ghost"
-                  onClick={() => setIsDeleteAllModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="cursor-pointer"
-                  variant="destructive"
-                  onClick={async () => {
-                    await handleDeleteAllSubscription();
-                  }}
-                >
-                  Delete All
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </>
-      ) : (
-        <SubscriptionDetail
-          editForm={editForm}
-          setEditForm={setEditForm}
-          onBack={handleBackToList}
-          onDelete={() => handleDeleteSubscription(editForm._id)}
-          onUpdate={handleUpdateSubscription}
-        />
-      )}
+        )}
+      </div>
     </div>
   );
 }
