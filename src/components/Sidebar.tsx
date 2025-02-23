@@ -10,16 +10,28 @@ import {
   Settings,
   ChevronRight,
 } from "lucide-react";
+import UserProfile from "./UserProfile";
+import { useSession } from "next-auth/react";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { name: "Subscriptions", href: "/subscriptions", icon: CreditCard },
   { name: "Analytics", href: "/analytics", icon: BarChart2 },
-  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export default function Sidebar({isCollapsed, setIsCollapsed}: {isCollapsed: boolean, setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>}) {
+export default function Sidebar({
+  isCollapsed,
+  setIsCollapsed,
+}: {
+  isCollapsed: boolean;
+  setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const user = {
+    name: session?.user.username ?? "",
+    email: session?.user.email ?? "",
+  };
 
   return (
     <div
@@ -98,6 +110,7 @@ export default function Sidebar({isCollapsed, setIsCollapsed}: {isCollapsed: boo
           );
         })}
       </nav>
+      <UserProfile isCollapsed={isCollapsed} user={user} />
     </div>
   );
 }
