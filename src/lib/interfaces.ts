@@ -70,3 +70,22 @@ export interface SubscriptionCardProps {
   onSubscriptionPage?: boolean;
   onClick?: (id: string) => void;
 }
+
+export interface MonthlySpendingData {
+  month: string;
+  amount: number;
+  isCurrentMonth?: boolean;
+}
+
+export interface MonthlySpendingChartProps {
+  data: MonthlySpendingData[];
+}
+
+export interface CategoryData {
+  name: string;
+  percentage: number;
+}
+
+export interface CategoryDistributionProps {
+  data: CategoryData[];
+}
