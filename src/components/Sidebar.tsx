@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   CreditCard,
   BarChart2,
-  Settings,
   ChevronRight,
 } from "lucide-react";
 import UserProfile from "./UserProfile";
