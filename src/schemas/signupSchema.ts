@@ -8,6 +8,7 @@ export const usernameValidation = z
 
 export const signupSchema = z.object({
   username: usernameValidation,
+  name: z.string(),
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   await dbConnect();
 
   try {
-    const { username, email, password } = await request.json();
+    const { username, name, email, password } = await request.json();
 
     const validateExistingUsername = await UserModel.findOne({
       username,
@@ -42,6 +42,7 @@ export async function POST(request: Request) {
 
     const user = new UserModel({
       username,
+      name,
       email,
       password: hashedPassword,
       verifyCode,
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
       monthlyExpense: 0,
       subscription: [],
     });
-    
+
     await user.save();
     return Response.json(
       { success: true, message: "User registered successfully" },

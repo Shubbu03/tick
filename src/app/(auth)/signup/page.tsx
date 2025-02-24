@@ -36,6 +36,7 @@ export default function Signup() {
     resolver: zodResolver(signupSchema),
     defaultValues: {
       username: "",
+      name: "",
       email: "",
       password: "",
     },
@@ -92,8 +93,7 @@ export default function Signup() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden">
-      <div className="absolute top-4 right-4">
-      </div>
+      <div className="absolute top-4 right-4"></div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -145,6 +145,23 @@ export default function Signup() {
                       {usernameMessage}
                     </p>
                   )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">
+                    Name
+                  </FormLabel>
+                  <Input
+                    {...field}
+                    name="name"
+                    className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+                  />
                   <FormMessage />
                 </FormItem>
               )}
