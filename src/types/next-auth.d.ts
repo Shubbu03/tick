@@ -7,6 +7,8 @@ declare module "next-auth" {
       _id?: string;
       monthlyExpense: number;
       username?: string;
+      name?: string;
+      image?: string;
     } & DefaultSession["user"];
   }
 
@@ -14,6 +16,8 @@ declare module "next-auth" {
     _id?: string;
     monthlyExpense: number;
     username?: string;
+    name?: string;
+    image?: string;
   }
 }
 
@@ -22,5 +26,7 @@ declare module "next-auth/jwt" {
     _id?: string;
     monthlyExpense: number;
     username?: string;
+    name?: string;
+    image?: string;
   }
 }
