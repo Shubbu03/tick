@@ -69,6 +69,11 @@ const userSchema: Schema<User> = new Schema({
     unique: true,
     trim: true,
   },
+  name: {
+    type: String,
+    required: [true, "Name is required!!"],
+    trim: true,
+  },
   email: {
     type: String,
     required: [true, "Email is required!!"],
@@ -78,6 +83,10 @@ const userSchema: Schema<User> = new Schema({
   password: {
     type: String,
     required: [true, "Password is required!!"],
+  },
+  profilePicture: {
+    type: String,
+    default: "", // Default empty string for no profile picture
   },
   verifyCode: {
     type: String,
