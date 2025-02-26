@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
+import bcrypt from "bcryptjs";
 
 const updateProfileSchema = z.object({
   username: z
@@ -19,6 +20,11 @@ const updateProfileSchema = z.object({
     .min(2, "Name must be at least 2 characters long")
     .max(50, "Name cannot exceed 50 characters"),
   email: z.string().email("Please provide a valid email address"),
+  currentPassword: z.string().optional(),
+  newPassword: z
+    .string()
+    .min(8, "Password must be at least 8 characters long")
+    .optional(),
 });
 
 type UpdateProfileData = z.infer<typeof updateProfileSchema>;
@@ -46,7 +52,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { username, name, email } = validationResult.data;
+    const { username, name, email, currentPassword, newPassword } =
+      validationResult.data;
 
     if (email !== session.user.email) {
       const existingUser = await UserModel.findOne({
@@ -62,15 +69,40 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    const updateData: any = {
+      username,
+      name,
+      email,
+    };
+
+    if (currentPassword && newPassword) {
+      const user = await UserModel.findById(userID).select("+password");
+
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      const isPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
+
+      if (!isPasswordValid) {
+        return NextResponse.json(
+          { error: "Current password is incorrect" },
+          { status: 400 }
+        );
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      updateData.password = hashedPassword;
+    }
+
     const updatedUser = await UserModel.findByIdAndUpdate(
       userID,
-      {
-        $set: {
-          username,
-          name,
-          email,
-        },
-      },
+      { $set: updateData },
       { new: true }
     );
 
@@ -80,6 +112,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      passwordChanged: Boolean(currentPassword && newPassword),
       user: {
         id: updatedUser._id,
         username: updatedUser.username,
