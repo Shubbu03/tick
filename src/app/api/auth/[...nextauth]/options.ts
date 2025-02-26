@@ -50,6 +50,9 @@ export const authOptions: NextAuthOptions = {
         session.user._id = token._id;
         session.user.monthlyExpense = token.monthlyExpense;
         session.user.username = token.username;
+        session.user.email = token.email;
+        session.user.name = token.name;
+        session.user.image = token.image;
       }
       return session;
     },
@@ -58,6 +61,9 @@ export const authOptions: NextAuthOptions = {
         token._id = user._id?.toString();
         token.monthlyExpense = user.monthlyExpense;
         token.username = user.username;
+        token.email = user.email;
+        token.name = user.name;
+        token.image = user.image;
       }
       return token;
     },
