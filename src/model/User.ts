@@ -86,7 +86,7 @@ const userSchema: Schema<User> = new Schema({
   },
   profilePicture: {
     type: String,
-    default: "", // Default empty string for no profile picture
+    default: "", 
   },
   verifyCode: {
     type: String,
