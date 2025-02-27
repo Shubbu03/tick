@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token._id = user._id?.toString();
         token.monthlyExpense = user.monthlyExpense;
@@ -64,6 +64,15 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.name = user.name;
         token.image = user.image;
+      }
+      if (trigger === "update" && session) {
+        if (session._id) token._id = session._id;
+        if (session.monthlyExpense !== undefined)
+          token.monthlyExpense = session.monthlyExpense;
+        if (session.username) token.username = session.username;
+        if (session.email) token.email = session.email;
+        if (session.name) token.name = session.name;
+        if (session.image) token.image = session.image;
       }
       return token;
     },
@@ -74,6 +83,7 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
