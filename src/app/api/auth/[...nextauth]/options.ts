@@ -34,7 +34,14 @@ export const authOptions: NextAuthOptions = {
           );
 
           if (correctPassword) {
-            return user;
+            return {
+              _id: user._id,
+              email: user.email,
+              username: user.username,
+              name: user.name,
+              monthlyExpense: user.monthlyExpense,
+              image: user.profilePicture,
+            };
           } else {
             throw new Error("Incorrect password!!");
           }
