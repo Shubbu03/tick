@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import React, { useEffect, useRef, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,13 @@ import { useSession } from "next-auth/react";
 import { getInitials } from "@/lib/userInitials";
 import { toast } from "@/components/ui/use-toast";
 import axios, { AxiosError } from "axios";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export default function Profile() {
   const { data: session, update } = useSession();
@@ -25,6 +32,22 @@ export default function Profile() {
     email: user?.email || "",
   });
 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordError, setPasswordError] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [profileImage, setProfileImage] = useState(user?.image || "");
+  const [imageError, setImageError] = useState(false);
+  const [isHoveringAvatar, setIsHoveringAvatar] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -32,10 +55,14 @@ export default function Profile() {
         name: user.name || "",
         email: user.email || "",
       });
+
+      setProfileImage(user.image || "");
+      setImageError(false);
     }
   }, [user]);
 
   const { username, name, email } = formData;
+  const { currentPassword, newPassword, confirmPassword } = passwordData;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -74,9 +101,85 @@ export default function Profile() {
     }
   }, [username, user?.username]);
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setPasswordData((prev) => ({ ...prev, [id]: value }));
+    setPasswordError("");
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload only JPG, JPEG or PNG images.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Image size should be less than 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("userId", userID as string);
+
+      const response = await axios.post("/api/upload-profile-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.success) {
+        await update({
+          image: response.data.imageUrl,
+        });
+
+        setProfileImage(response.data.imageUrl || "");
+        setImageError(false);
+
+        toast({
+          title: "Profile picture updated",
+          description: "Your profile picture has been updated successfully.",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload profile picture. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (
       usernameMessage === "Username already exists, try another" ||
       isCheckingUsername
@@ -92,19 +195,41 @@ export default function Profile() {
     setIsLoading(true);
 
     try {
-      const response = await axios.put("/api/update-profile", formData);
+      const submissionData = {
+        ...formData,
+        ...(currentPassword && newPassword
+          ? {
+              currentPassword,
+              newPassword,
+            }
+          : {}),
+      };
+
+      const response = await axios.put("/api/update-profile", submissionData);
 
       if (response.data.success) {
-        await axios.post("/api/refresh-session");
-        toast({
-          title: "Profile updated",
-          description: "Your profile has been updated successfully.",
-          variant: "default",
+        await update({
+          username: formData.username,
+          name: formData.name,
+          email: formData.email,
+          _id: userID,
+          monthlyExpense: user?.monthlyExpense,
+          image: profileImage,
         });
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        toast({
+          title: "Profile updated",
+          description: response.data.passwordChanged
+            ? "Your profile and password have been updated successfully."
+            : "Your profile has been updated successfully.",
+          variant: "default",
+        });
       }
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -133,11 +258,43 @@ export default function Profile() {
         </div>
 
         <div className="mt-8 flex items-center">
-          <Avatar className="h-48 w-48">
-            <AvatarFallback className="bg-blue-100 text-blue-600 text-3xl font-medium">
-              {user?.image ? user.image : userInitials}
-            </AvatarFallback>
-          </Avatar>
+          <div
+            className="relative inline-block"
+            onMouseEnter={() => setIsHoveringAvatar(true)}
+            onMouseLeave={() => setIsHoveringAvatar(false)}
+            onClick={handleAvatarClick}
+          >
+            <Avatar className="h-48 w-48 cursor-pointer transition-opacity duration-200 hover:opacity-80">
+              {profileImage && !imageError ? (
+                <AvatarImage
+                  src={profileImage}
+                  alt={user?.name || "User"}
+                  onError={handleImageError}
+                />
+              ) : null}
+              <AvatarFallback className="bg-blue-100 text-blue-600 text-3xl font-medium">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
+
+            {isHoveringAvatar && (
+              <div className="absolute inset-0 flex items-end justify-center rounded-full overflow-hidden">
+                <div className="w-full bg-black bg-opacity-60 text-white py-2 text-center text-sm font-medium">
+                  {uploadingImage ? "Uploading..." : "Upload Image"}
+                </div>
+              </div>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              className="hidden"
+              onChange={handleFileChange}
+              disabled={uploadingImage}
+            />
+          </div>
+
           <div className="ml-6">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {user?.name}
@@ -192,6 +349,102 @@ export default function Profile() {
               onChange={handleChange}
             />
           </div>
+
+          <Accordion type="single" collapsible className="w-full mt-6">
+            <AccordionItem value="change-password">
+              <AccordionTrigger className="text-gray-900 dark:text-gray-100">
+                Change Password
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="currentPassword"
+                        type={showCurrentPassword ? "text" : "password"}
+                        placeholder="Current password"
+                        className="rounded-xl pr-10"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        onClick={() =>
+                          setShowCurrentPassword(!showCurrentPassword)
+                        }
+                      >
+                        {showCurrentPassword ? (
+                          <EyeOffIcon className="h-5 w-5" />
+                        ) : (
+                          <EyeIcon className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="newPassword"
+                        type={showNewPassword ? "text" : "password"}
+                        placeholder="New password (8+ characters)"
+                        className="rounded-xl pr-10"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? (
+                          <EyeOffIcon className="h-5 w-5" />
+                        ) : (
+                          <EyeIcon className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm new password"
+                        className="rounded-xl pr-10"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOffIcon className="h-5 w-5" />
+                        ) : (
+                          <EyeIcon className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {passwordError && (
+                    <p className="text-sm text-red-500 mt-1">{passwordError}</p>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           <div className="pt-4">
             <Button
