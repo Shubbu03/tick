@@ -1,5 +1,7 @@
 import { getInitials } from "@/lib/userInitials";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 interface UserProfileProps {
@@ -11,7 +13,9 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ isCollapsed, user }: UserProfileProps) {
+  const { data: session } = useSession();
   const userInitials = getInitials(user.name);
+  const userProfilePic = session?.user.image;
 
   return (
     <Link href="/profile" className="block">
@@ -25,9 +29,18 @@ export default function UserProfile({ isCollapsed, user }: UserProfileProps) {
         hover:bg-white/10 transition-colors duration-200
       `}
       >
-        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
-          {userInitials}
-        </div>
+        <Avatar className="w-8 h-8 cursor-pointer transition-opacity duration-200 hover:opacity-80 rounded-full overflow-hidden">
+          {userProfilePic ? (
+            <AvatarImage
+              src={userProfilePic}
+              alt="User"
+              className="rounded-full w-full h-full object-cover"
+            />
+          ) : null}
+          <AvatarFallback className="bg-teal-100 text-teal-600 text-xs rounded-full w-full h-full flex items-center justify-center">
+            {userInitials}
+          </AvatarFallback>
+        </Avatar>
         {!isCollapsed && (
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
