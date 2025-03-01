@@ -2,10 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "next-themes";
-import AnimatedBackground from "@/app/(landing)/components/AnimatedBackground";
 import Hero from "@/app/(landing)/components/Hero";
 import Features from "@/app/(landing)/components/Features";
 import Footer from "@/app/(landing)/components/Footer";
+import dynamic from "next/dynamic";
+
+const AnimatedBackground = dynamic(
+  () => import("@/app/(landing)/components/AnimatedBackground"),
+  { ssr: false }
+);
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
