@@ -60,42 +60,45 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden px-4 sm:px-6">
       <div className="absolute top-4 right-4"></div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl"
+        className="w-full max-w-md p-4 sm:p-8 space-y-6 sm:space-y-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl mx-auto my-8"
       >
         <div className="text-center">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-blue-600 dark:from-teal-200 dark:to-blue-300"
+            className="text-3xl sm:text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-blue-600 dark:from-teal-200 dark:to-blue-300"
           >
             Welcome Back to Tick
           </motion.h1>
-          <p className="mb-4 text-gray-600 dark:text-gray-300">
+          <p className="mb-4 text-sm sm:text-base text-gray-600 dark:text-gray-300">
             Login to view your subscriptions
           </p>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 sm:space-y-6"
+          >
             <FormField
               name="identifier"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-200">
-                    Email/Username
+                    Email
                   </FormLabel>
                   <Input
                     {...field}
                     className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
                   />
-                  <FormMessage />
+                  <FormMessage className="text-xs sm:text-sm" />
                 </FormItem>
               )}
             />
@@ -112,12 +115,12 @@ export default function Login() {
                     {...field}
                     className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
                   />
-                  <FormMessage />
+                  <FormMessage className="text-xs sm:text-sm" />
                 </FormItem>
               )}
             />
             <Button
-              className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600"
+              className="w-full mt-6 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 py-2 px-4"
               type="submit"
             >
               Login
@@ -125,7 +128,7 @@ export default function Login() {
           </form>
         </Form>
         <div className="text-center mt-4">
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
             Not a member yet?{" "}
             <Link
               href="/signup"

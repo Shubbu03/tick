@@ -92,29 +92,32 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 dark:from-teal-950 dark:via-cyan-900 dark:to-blue-950 relative overflow-hidden px-4 sm:px-6">
       <div className="absolute top-4 right-4"></div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl"
+        className="w-full max-w-md p-4 sm:p-8 space-y-6 sm:space-y-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl mx-auto my-8"
       >
         <div className="text-center">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-blue-600 dark:from-teal-200 dark:to-blue-300"
+            className="text-3xl sm:text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-blue-600 dark:from-teal-200 dark:to-blue-300"
           >
             Join Tick
           </motion.h1>
-          <p className="mb-4 text-gray-600 dark:text-gray-300">
+          <p className="mb-4 text-sm sm:text-base text-gray-600 dark:text-gray-300">
             Sign up to track your subscriptions
           </p>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 sm:space-y-6"
+          >
             <FormField
               name="username"
               control={form.control}
@@ -132,11 +135,16 @@ export default function Signup() {
                     className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
                   />
                   {isCheckingUsername && (
-                    <Loader2 className="animate-spin text-teal-500" />
+                    <div className="flex items-center mt-1">
+                      <Loader2 className="h-4 w-4 animate-spin text-teal-500 mr-2" />
+                      <span className="text-xs text-gray-500">
+                        Checking availability...
+                      </span>
+                    </div>
                   )}
                   {!isCheckingUsername && usernameMessage && (
                     <p
-                      className={`text-sm ${
+                      className={`text-xs sm:text-sm mt-1 ${
                         usernameMessage === "Username is available"
                           ? "text-green-500"
                           : "text-red-500"
@@ -145,7 +153,7 @@ export default function Signup() {
                       {usernameMessage}
                     </p>
                   )}
-                  <FormMessage />
+                  <FormMessage className="text-xs sm:text-sm" />
                 </FormItem>
               )}
             />
@@ -162,7 +170,7 @@ export default function Signup() {
                     name="name"
                     className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
                   />
-                  <FormMessage />
+                  <FormMessage className="text-xs sm:text-sm" />
                 </FormItem>
               )}
             />
@@ -178,8 +186,9 @@ export default function Signup() {
                     {...field}
                     name="email"
                     className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+                    type="email"
                   />
-                  <FormMessage />
+                  <FormMessage className="text-xs sm:text-sm" />
                 </FormItem>
               )}
             />
@@ -198,13 +207,13 @@ export default function Signup() {
                     name="password"
                     className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
                   />
-                  <FormMessage />
+                  <FormMessage className="text-xs sm:text-sm" />
                 </FormItem>
               )}
             />
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600"
+              className="w-full mt-6 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 py-2 px-4"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -219,7 +228,7 @@ export default function Signup() {
           </form>
         </Form>
         <div className="text-center mt-4">
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
             Already a member?{" "}
             <Link
               href="/login"
