@@ -83,7 +83,7 @@ const SubscriptionCard = ({
             {isActive && (
               <Circle className="w-4 h-4 text-green-500 fill-current" />
             )}
-            {autoRenew && <Repeat className="w-4 h-4 text-gray-500" />}
+            {autoRenew && <Repeat className="w-4 h-4 text-black" />}
           </div>
           <p className="font-medium">₹{price}/mo</p>
         </div>

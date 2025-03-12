@@ -143,7 +143,7 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               placeholder="Spotify.."
-              className={errors.name ? "border-red-500" : ""}
+              className={errors.name ? "border-red-500" : "text-gray-400"}
             />
             {errors.name && (
               <p className="text-red-500 text-sm">{errors.name}</p>
@@ -159,7 +159,9 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
                 handleInputChange("planSelected", e.target.value)
               }
               placeholder="Premium.."
-              className={errors.planSelected ? "border-red-500" : ""}
+              className={
+                errors.planSelected ? "border-red-500" : "text-gray-400"
+              }
             />
             {errors.planSelected && (
               <p className="text-red-500 text-sm">{errors.planSelected}</p>
@@ -175,11 +177,13 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
               value={formData.planDuration}
             >
               <SelectTrigger
-                className={errors.planDuration ? "border-red-500" : ""}
+                className={
+                  errors.planDuration ? "border-red-500" : "text-gray-400"
+                }
               >
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400">
                 <SelectItem value={PlanType.Monthly}>Monthly</SelectItem>
                 <SelectItem value={PlanType.Quarterly}>Quarterly</SelectItem>
                 <SelectItem value={PlanType.Half_Yearly}>
@@ -201,7 +205,7 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
               value={formData.price}
               onChange={(e) => handleInputChange("price", e.target.value)}
               placeholder="0.00"
-              className={errors.price ? "border-red-500" : ""}
+              className={errors.price ? "border-red-500" : "text-gray-400"}
             />
             {errors.price && (
               <p className="text-red-500 text-sm">{errors.price}</p>
@@ -215,7 +219,7 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
                 type="button"
                 variant="outline"
                 className={cn(
-                  "w-full pl-3 text-left font-normal bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
+                  "w-full pl-3 text-left font-normal bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400",
                   !formData.dueDate && "text-muted-foreground",
                   errors.dueDate && "border-red-500"
                 )}
@@ -285,11 +289,11 @@ const AddSubscriptionModal: FC<ExtendedAddSubscriptionModalProps> = ({
               value={formData.category}
             >
               <SelectTrigger
-                className={errors.category ? "border-red-500" : ""}
+                className={errors.category ? "border-red-500" : "text-gray-400"}
               >
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400">
                 <SelectItem value={SubscriptionCategory.Music}>
                   Music
                 </SelectItem>
